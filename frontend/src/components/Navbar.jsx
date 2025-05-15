@@ -95,7 +95,7 @@ const Navbar = () => {
                 className="hidden md:flex items-center cursor-pointer"
               >
                 <FiUser size={20} />
-                <span className="ml-1 text-sm font-medium">Login</span>
+                <Link to="/auth" className="ml-1 text-sm font-medium">Login</Link>
               </motion.div>
               
               <motion.div 

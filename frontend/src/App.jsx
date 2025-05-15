@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
+import AuthPage from "./pages/AuthPage";
 import { useSearch } from "./context/SearchContext";
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/category/:category" element={<CategoryPage />} />
             <Route path="/product/:productId" element={<ProductDetailsPage />} />
+            <Route path="/auth" element={<AuthPage />} />
           </Routes>
         </main>
         <Footer />
