@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiChevronDown, FiPhone, FiMapPin, FiPackage } from 'react-icons/fi';
-import logoImg from '../assets/logo.png';
-import { useSearch } from '../context/SearchContext';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiSearch,
+  FiShoppingCart,
+  FiUser,
+  FiMenu,
+  FiChevronDown,
+  FiPhone,
+  FiMapPin,
+  FiPackage,
+  FiHeart,
+} from "react-icons/fi";
+import logoImg from "../assets/logo.png";
+import { useSearch } from "../context/SearchContext";
 
 // Categories data for the dropdown
 const categories = [
-  { name: 'Televisions', link: '/category/televisions' },
-  { name: 'Laptops', link: '/category/laptops' },
-  { name: 'Smartphones', link: '/category/smartphones' },
-  { name: 'Audio', link: '/category/audio' },
-  { name: 'Cameras', link: '/category/cameras' },
-  { name: 'Kitchen Appliances', link: '/category/kitchen-appliances' },
-  { name: 'Home Appliances', link: '/category/home-appliances' },
-  { name: 'Gaming', link: '/category/gaming' },
-  { name: 'Sofa Sets', link: '/category/sofa-sets' },
-  { name: 'Dining Tables', link: '/category/dining-tables' },
-  { name: 'Bedroom Furniture', link: '/category/bedroom-furniture' },
-  { name: 'Office Furniture', link: '/category/office-furniture' },
+  { name: "Televisions", link: "/category/televisions" },
+  { name: "Laptops", link: "/category/laptops" },
+  { name: "Smartphones", link: "/category/smartphones" },
+  { name: "Audio", link: "/category/audio" },
+  { name: "Cameras", link: "/category/cameras" },
+  { name: "Kitchen Appliances", link: "/category/kitchen-appliances" },
+  { name: "Home Appliances", link: "/category/home-appliances" },
+  { name: "Gaming", link: "/category/gaming" },
+  { name: "Sofa Sets", link: "/category/sofa-sets" },
+  { name: "Dining Tables", link: "/category/dining-tables" },
+  { name: "Bedroom Furniture", link: "/category/bedroom-furniture" },
+  { name: "Office Furniture", link: "/category/office-furniture" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+
   // Use search context instead of local state
   const { searchQuery, setSearchQuery, performSearch } = useSearch();
 
@@ -41,23 +51,25 @@ const Navbar = () => {
         <div className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {/* Logo */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               className="flex-shrink-0"
             >
               <Link to="/" className="flex items-center">
-                <img 
-                  src={logoImg} 
-                  alt="Jayasinghe Storelines Logo" 
+                <img
+                  src={logoImg}
+                  alt="Jayasinghe Storelines Logo"
                   className="h-12 w-auto"
                 />
                 <div className="ml-2">
                   <h1 className="text-xl font-bold text-primary">
                     Jayasinghe Storelines
                   </h1>
-                  <p className="text-xs text-gray-600">PREMIUM ELECTRONICS & FURNITURE</p>
+                  <p className="text-xs text-gray-600">
+                    PREMIUM ELECTRONICS & FURNITURE
+                  </p>
                 </div>
               </Link>
             </motion.div>
@@ -65,14 +77,14 @@ const Navbar = () => {
             {/* Search */}
             <div className="hidden md:flex flex-grow max-w-2xl mx-4">
               <form className="relative w-full" onSubmit={handleSearch}>
-                <input 
-                  type="text" 
-                  placeholder="Search for products, categories and more" 
+                <input
+                  type="text"
+                  placeholder="Search for products, categories and more"
                   className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute right-0 top-0 h-full px-4 bg-primary text-white rounded-r-md"
                 >
@@ -83,16 +95,18 @@ const Navbar = () => {
 
             {/* Right side items */}
             <div className="flex items-center space-x-4">
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="hidden md:flex items-center cursor-pointer"
               >
                 <FiPhone size={16} className="text-primary" />
-                <span className="ml-1 text-sm font-medium">+94 112 222 888</span>
+                <span className="ml-1 text-sm font-medium">
+                  +94 112 222 888
+                </span>
               </motion.div>
-              
+
               {/* User/Account section with dropdown */}
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="hidden md:flex items-center cursor-pointer relative"
                 onMouseEnter={() => setIsUserMenuOpen(true)}
@@ -101,26 +115,26 @@ const Navbar = () => {
                 <FiUser size={20} />
                 <span className="ml-1 text-sm font-medium">Account</span>
                 <FiChevronDown size={14} className="ml-1" />
-                
+
                 {/* User dropdown menu */}
                 <AnimatePresence>
                   {isUserMenuOpen && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       className="absolute top-full right-0 mt-1 w-48 bg-white shadow-lg rounded-md z-50"
                     >
                       <div className="py-1">
-                        <Link 
-                          to="/auth" 
+                        <Link
+                          to="/auth"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           Login / Register
                         </Link>
-                        <Link 
-                          to="/my-orders" 
+                        <Link
+                          to="/my-orders"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
@@ -129,15 +143,15 @@ const Navbar = () => {
                             My Orders
                           </span>
                         </Link>
-                        <Link 
-                          to="/profile" 
+                        <Link
+                          to="/profile"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           My Profile
                         </Link>
-                        <Link 
-                          to="/wishlist" 
+                        <Link
+                          to="/wishlist"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
@@ -148,20 +162,27 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </motion.div>
-              
+
               {/* Mobile login link */}
-              <Link to="/auth" className="md:hidden flex items-center cursor-pointer">
+              <Link
+                to="/auth"
+                className="md:hidden flex items-center cursor-pointer"
+              >
                 <FiUser size={20} />
               </Link>
-              
+
               <Link to="/cart" className="flex items-center cursor-pointer">
                 <div className="relative">
                   <FiShoppingCart size={20} />
-                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
+                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    2
+                  </span>
                 </div>
-                <span className="ml-1 text-sm font-medium hidden md:inline">Cart</span>
+                <span className="ml-1 text-sm font-medium hidden md:inline">
+                  Cart
+                </span>
               </Link>
-              
+
               <div className="md:hidden">
                 <button onClick={() => setIsOpen(!isOpen)}>
                   <FiMenu size={24} />
@@ -171,25 +192,30 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Categories navbar */}
       <div className="bg-primary text-white relative z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center h-10">
             <div className="hidden md:flex items-center space-x-6 text-sm">
-              <div 
+              <div
                 className="relative flex items-center cursor-pointer h-full"
                 onMouseEnter={() => setIsCategoryOpen(true)}
                 onMouseLeave={() => setIsCategoryOpen(false)}
               >
                 <FiMenu className="mr-2" />
                 <span>All Categories</span>
-                <FiChevronDown size={14} className={`ml-1 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`} />
-                
+                <FiChevronDown
+                  size={14}
+                  className={`ml-1 transition-transform duration-200 ${
+                    isCategoryOpen ? "rotate-180" : ""
+                  }`}
+                />
+
                 {/* Dropdown menu */}
                 <AnimatePresence>
                   {isCategoryOpen && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
@@ -199,7 +225,7 @@ const Navbar = () => {
                         {categories.map((category) => (
                           <motion.div
                             key={category.name}
-                            whileHover={{ backgroundColor: '#f3f4f6' }}
+                            whileHover={{ backgroundColor: "#f3f4f6" }}
                           >
                             <Link
                               to={category.link}
@@ -215,17 +241,42 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </div>
-              <Link to="/category/electronics" className="cursor-pointer hover:underline">Electronics</Link>
-              <Link to="/category/furniture" className="cursor-pointer hover:underline">Furniture</Link>
-              <Link to="/category/appliances" className="cursor-pointer hover:underline">Appliances</Link>
-              <Link to="/category/offers" className="cursor-pointer hover:underline">Special Offers</Link>
-              <Link to="/services" className="cursor-pointer hover:underline">Premium Service</Link>
+              <Link
+                to="/category/electronics"
+                className="cursor-pointer hover:underline"
+              >
+                Electronics
+              </Link>
+              <Link
+                to="/category/furniture"
+                className="cursor-pointer hover:underline"
+              >
+                Furniture
+              </Link>
+              <Link
+                to="/category/appliances"
+                className="cursor-pointer hover:underline"
+              >
+                Appliances
+              </Link>
+              <Link
+                to="/category/offers"
+                className="cursor-pointer hover:underline"
+              >
+                Special Offers
+              </Link>
+              <Link to="/services" className="cursor-pointer hover:underline">
+                Premium Service
+              </Link>
             </div>
-            
+
             <div className="md:hidden flex-grow"></div>
-            
+
             <div className="flex items-center space-x-4 ml-auto text-sm">
-              <Link to="/my-orders" className="cursor-pointer flex items-center hover:underline">
+              <Link
+                to="/my-orders"
+                className="cursor-pointer flex items-center hover:underline"
+              >
                 <FiPackage className="mr-1" />
                 <span>Track your order</span>
               </Link>
@@ -237,25 +288,25 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile menu */}
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           className="md:hidden bg-white border-b fixed top-[60px] left-0 right-0 z-50 shadow-lg"
         >
           <div className="container mx-auto px-4 py-3">
             <div className="flex flex-col space-y-3">
               <form onSubmit={handleSearch} className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search products" 
+                <input
+                  type="text"
+                  placeholder="Search products"
                   className="w-full py-2 px-4 rounded-md border border-gray-300 focus:outline-none"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute right-0 top-0 h-full px-4 bg-primary text-white rounded-r-md"
                 >
@@ -264,7 +315,7 @@ const Navbar = () => {
               </form>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {categories.slice(0, 6).map((category) => (
-                  <Link 
+                  <Link
                     key={category.name}
                     to={category.link}
                     className="p-2 border rounded-md text-center hover:bg-gray-50 hover:border-primary transition-colors"
@@ -274,14 +325,36 @@ const Navbar = () => {
                   </Link>
                 ))}
               </div>
-              <Link to="/categories" onClick={() => setIsOpen(false)} className="text-primary text-center py-2">View All Categories</Link>
-              <Link 
+              <Link
+                to="/categories"
+                onClick={() => setIsOpen(false)}
+                className="text-primary text-center py-2"
+              >
+                View All Categories
+              </Link>
+              <Link
                 to="/my-orders"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 <FiPackage className="mr-2" />
                 My Orders
+              </Link>
+              <Link 
+                to="/profile" 
+                className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <FiUser className="mr-2" />
+                My Profile
+              </Link>
+              <Link 
+                to="/wishlist" 
+                className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <FiHeart className="mr-2" />
+                My Wishlist
               </Link>
               <div className="flex items-center justify-between border-t pt-2">
                 <div className="flex items-center">
