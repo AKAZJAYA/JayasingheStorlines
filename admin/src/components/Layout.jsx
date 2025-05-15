@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
 import { 
   FiHome, FiUsers, FiShoppingBag, FiShoppingCart, 
   FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiSearch,
-  FiArrowRight, FiBarChart2
+  FiArrowRight, FiBarChart2, FiTruck
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 // import { useAuth } from '../context/AuthContext';
@@ -28,6 +28,7 @@ const Layout = () => {
     { name: 'User Management', icon: <FiUsers />, href: '/users' },
     { name: 'Products', icon: <FiShoppingBag />, href: '/products' },
     { name: 'Orders', icon: <FiShoppingCart />, href: '/orders' },
+      { name: 'Deliveries', href: '/deliveries', icon: <FiTruck /> },
     { name: 'Sales', icon: <FiBarChart2 />, href: '/sales' },
     { name: 'Settings', icon: <FiSettings />, href: '/settings' },
   ];
