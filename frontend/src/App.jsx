@@ -7,26 +7,28 @@ import CategoryPage from "./pages/CategoryPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import AuthPage from "./pages/AuthPage";
 import CartPage from "./pages/CartPage";
-import { useSearch } from "./context/SearchContext";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import { SearchProvider } from "./context/SearchContext";
 
 const App = () => {
-  const { searchQuery } = useSearch();
-  
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/category/:category" element={<CategoryPage />} />
-            <Route path="/product/:productId" element={<ProductDetailsPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/cart" element={<CartPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <SearchProvider>
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/category/:category" element={<CategoryPage />} />
+              <Route path="/product/:productId" element={<ProductDetailsPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/my-orders" element={<MyOrdersPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </SearchProvider>
     </BrowserRouter>
   );
 };

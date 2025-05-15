@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag, FiShield, FiCreditCard, FiTruck } from 'react-icons/fi';
+import { 
+  FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag, FiShield, 
+  FiCreditCard, FiTruck, FiUser, FiMapPin, FiPhone, FiMail, FiChevronsDown,
+  FiChevronsUp, FiHome, FiCheckCircle, FiDollarSign, FiCreditCard as FiCard
+} from 'react-icons/fi';
 import ServiceHighlights from '../components/ServiceHighlights';
 import Newsletter from '../components/Newsletter';
 
@@ -35,6 +39,32 @@ const CartPage = () => {
   const [promoApplied, setPromoApplied] = useState(false);
   const [shippingMethod, setShippingMethod] = useState('standard');
   const [isCartEmpty, setIsCartEmpty] = useState(false);
+  const [billingExpanded, setBillingExpanded] = useState(true);
+  const [paymentExpanded, setPaymentExpanded] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  
+  // Billing information
+  const [billingInfo, setBillingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    province: '',
+    postalCode: '',
+  });
+
+  const [shippingInfo, setShippingInfo] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    province: '',
+    postalCode: '',
+    phone: '',
+  });
   
   // Calculate cart totals
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -62,6 +92,64 @@ const CartPage = () => {
   const applyPromoCode = () => {
     if (promoCode.toUpperCase() === 'WELCOME10') {
       setPromoApplied(true);
+    }
+  };
+
+  // Handle billing form changes
+  const handleBillingChange = (e) => {
+    const { name, value } = e.target;
+    setBillingInfo({
+      ...billingInfo,
+      [name]: value
+    });
+    
+    if (sameAsShipping) {
+      setShippingInfo({
+        ...shippingInfo,
+        [name]: value
+      });
+    }
+  };
+  
+  // Handle shipping form changes
+  const handleShippingChange = (e) => {
+    const { name, value } = e.target;
+    setShippingInfo({
+      ...shippingInfo,
+      [name]: value
+    });
+  };
+
+  // Handle same as billing checkbox
+  const handleSameAsShipping = (e) => {
+    setSameAsShipping(e.target.checked);
+    if (e.target.checked) {
+      setShippingInfo({
+        firstName: billingInfo.firstName,
+        lastName: billingInfo.lastName,
+        address: billingInfo.address,
+        city: billingInfo.city,
+        province: billingInfo.province,
+        postalCode: billingInfo.postalCode,
+        phone: billingInfo.phone,
+      });
+    }
+  };
+  
+  // Expand/collapse sections
+  const toggleBillingSection = () => {
+    setBillingExpanded(!billingExpanded);
+    // If opening billing, close payment
+    if (!billingExpanded) {
+      setPaymentExpanded(false);
+    }
+  };
+  
+  const togglePaymentSection = () => {
+    setPaymentExpanded(!paymentExpanded);
+    // If opening payment, close billing
+    if (!paymentExpanded) {
+      setBillingExpanded(false);
     }
   };
   
@@ -124,8 +212,9 @@ const CartPage = () => {
         </div>
         
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Cart Items Section */}
+          {/* Left Column - Cart, Billing, Payment */}
           <div className="lg:w-8/12">
+            {/* Cart Items Section */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -208,6 +297,536 @@ const CartPage = () => {
                   Clear Cart
                 </button>
               </div>
+            </motion.div>
+
+            {/* Billing Details Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-white rounded-lg shadow-md overflow-hidden mb-6"
+            >
+              <div 
+                className="p-6 border-b border-gray-200 flex justify-between items-center cursor-pointer"
+                onClick={toggleBillingSection}
+              >
+                <div className="flex items-center">
+                  <div className="bg-primary text-white h-7 w-7 rounded-full flex items-center justify-center font-bold mr-3">
+                    1
+                  </div>
+                  <h3 className="text-xl font-bold">Billing Details</h3>
+                </div>
+                <button className="text-gray-500">
+                  {billingExpanded ? <FiChevronsUp size={24} /> : <FiChevronsDown size={24} />}
+                </button>
+              </div>
+
+              {billingExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-6"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="firstName">
+                        First Name*
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiUser className="text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          id="firstName"
+                          name="firstName"
+                          value={billingInfo.firstName}
+                          onChange={handleBillingChange}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                          placeholder="Enter your first name"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="lastName">
+                        Last Name*
+                      </label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={billingInfo.lastName}
+                        onChange={handleBillingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        placeholder="Enter your last name"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="email">
+                        Email Address*
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiMail className="text-gray-400" />
+                        </div>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          value={billingInfo.email}
+                          onChange={handleBillingChange}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                          placeholder="Enter your email"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="phone">
+                        Phone Number*
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiPhone className="text-gray-400" />
+                        </div>
+                        <input
+                          type="tel"
+                          id="phone"
+                          name="phone"
+                          value={billingInfo.phone}
+                          onChange={handleBillingChange}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                          placeholder="Enter your phone number"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="address">
+                        Address*
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiHome className="text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          id="address"
+                          name="address"
+                          value={billingInfo.address}
+                          onChange={handleBillingChange}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                          placeholder="Enter your street address"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="city">
+                        City*
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={billingInfo.city}
+                        onChange={handleBillingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        placeholder="Enter your city"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="province">
+                        Province*
+                      </label>
+                      <select
+                        id="province"
+                        name="province"
+                        value={billingInfo.province}
+                        onChange={handleBillingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        required
+                      >
+                        <option value="">Select Province</option>
+                        <option value="Western">Western</option>
+                        <option value="Central">Central</option>
+                        <option value="Southern">Southern</option>
+                        <option value="Northern">Northern</option>
+                        <option value="Eastern">Eastern</option>
+                        <option value="North Western">North Western</option>
+                        <option value="North Central">North Central</option>
+                        <option value="Uva">Uva</option>
+                        <option value="Sabaragamuwa">Sabaragamuwa</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="postalCode">
+                        Postal Code*
+                      </label>
+                      <input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        value={billingInfo.postalCode}
+                        onChange={handleBillingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        placeholder="Enter your postal code"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 mt-6 pt-6">
+                    <div className="flex items-center mb-4">
+                      <input
+                        type="checkbox"
+                        id="sameAsShipping"
+                        checked={sameAsShipping}
+                        onChange={handleSameAsShipping}
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      />
+                      <label htmlFor="sameAsShipping" className="ml-2 block text-sm text-gray-700">
+                        Shipping address is the same as my billing address
+                      </label>
+                    </div>
+
+                    {!sameAsShipping && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mb-6"
+                      >
+                        <h4 className="text-md font-semibold mb-4 border-b pb-2">Shipping Address</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              First Name*
+                            </label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={shippingInfo.firstName}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Last Name*
+                            </label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={shippingInfo.lastName}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Address*
+                            </label>
+                            <input
+                              type="text"
+                              name="address"
+                              value={shippingInfo.address}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              City*
+                            </label>
+                            <input
+                              type="text"
+                              name="city"
+                              value={shippingInfo.city}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Province*
+                            </label>
+                            <select
+                              name="province"
+                              value={shippingInfo.province}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            >
+                              <option value="">Select Province</option>
+                              <option value="Western">Western</option>
+                              <option value="Central">Central</option>
+                              <option value="Southern">Southern</option>
+                              <option value="Northern">Northern</option>
+                              <option value="Eastern">Eastern</option>
+                              <option value="North Western">North Western</option>
+                              <option value="North Central">North Central</option>
+                              <option value="Uva">Uva</option>
+                              <option value="Sabaragamuwa">Sabaragamuwa</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Postal Code*
+                            </label>
+                            <input
+                              type="text"
+                              name="postalCode"
+                              value={shippingInfo.postalCode}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Phone Number*
+                            </label>
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={shippingInfo.phone}
+                              onChange={handleShippingChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end mt-6">
+                    <button 
+                      onClick={togglePaymentSection}
+                      className="bg-primary text-white px-6 py-2 rounded-md font-medium flex items-center"
+                    >
+                      Continue to Payment <FiArrowRight className="ml-2" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Payment Methods Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white rounded-lg shadow-md overflow-hidden mb-6"
+            >
+              <div 
+                className="p-6 border-b border-gray-200 flex justify-between items-center cursor-pointer"
+                onClick={togglePaymentSection}
+              >
+                <div className="flex items-center">
+                  <div className="bg-primary text-white h-7 w-7 rounded-full flex items-center justify-center font-bold mr-3">
+                    2
+                  </div>
+                  <h3 className="text-xl font-bold">Payment Details</h3>
+                </div>
+                <button className="text-gray-500">
+                  {paymentExpanded ? <FiChevronsUp size={24} /> : <FiChevronsDown size={24} />}
+                </button>
+              </div>
+
+              {paymentExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-6"
+                >
+                  <div className="space-y-4">
+                    <div className="border border-gray-300 rounded-md p-4 cursor-pointer hover:border-primary transition-colors" onClick={() => setPaymentMethod('card')}>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="card-payment"
+                          name="payment-method"
+                          checked={paymentMethod === 'card'}
+                          onChange={() => setPaymentMethod('card')}
+                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                        />
+                        <label htmlFor="card-payment" className="ml-3 flex items-center justify-between w-full">
+                          <div className="flex items-center">
+                            <FiCard size={20} className="mr-2 text-primary" />
+                            <span className="font-medium">Credit / Debit Card</span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Mastercard" className="h-6" />
+                            <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="Visa" className="h-6" />
+                            <img src="https://cdn-icons-png.flaticon.com/512/196/196559.png" alt="PayPal" className="h-6" />
+                          </div>
+                        </label>
+                      </div>
+
+                      {paymentMethod === 'card' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 pl-7 space-y-4"
+                        >
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Card Number*
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="1234 5678 9012 3456"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-gray-700 text-sm font-medium mb-2">
+                                Expiry Date*
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="MM/YY"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-gray-700 text-sm font-medium mb-2">
+                                CVC/CVV*
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="123"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Cardholder Name*
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="John Doe"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    <div className="border border-gray-300 rounded-md p-4 cursor-pointer hover:border-primary transition-colors" onClick={() => setPaymentMethod('bank-transfer')}>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="bank-transfer"
+                          name="payment-method"
+                          checked={paymentMethod === 'bank-transfer'}
+                          onChange={() => setPaymentMethod('bank-transfer')}
+                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                        />
+                        <label htmlFor="bank-transfer" className="ml-3 flex items-center w-full">
+                          <FiDollarSign size={20} className="mr-2 text-primary" />
+                          <span className="font-medium">Bank Transfer</span>
+                        </label>
+                      </div>
+
+                      {paymentMethod === 'bank-transfer' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 pl-7"
+                        >
+                          <div className="bg-gray-50 rounded-md p-4">
+                            <h4 className="text-sm font-semibold mb-2">Bank Account Details:</h4>
+                            <p className="text-sm mb-1"><span className="font-medium">Bank Name:</span> Bank of Ceylon</p>
+                            <p className="text-sm mb-1"><span className="font-medium">Account Name:</span> Jayasinghe Storelines (Pvt) Ltd</p>
+                            <p className="text-sm mb-1"><span className="font-medium">Account Number:</span> 0123456789</p>
+                            <p className="text-sm mb-1"><span className="font-medium">Branch:</span> Colombo Main</p>
+                            <p className="text-sm text-gray-600 mt-3">
+                              Please include your order number in the payment reference. Your order will be processed once we receive the payment confirmation.
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    <div className="border border-gray-300 rounded-md p-4 cursor-pointer hover:border-primary transition-colors" onClick={() => setPaymentMethod('cod')}>
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="cod"
+                          name="payment-method"
+                          checked={paymentMethod === 'cod'}
+                          onChange={() => setPaymentMethod('cod')}
+                          className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                        />
+                        <label htmlFor="cod" className="ml-3 flex items-center w-full">
+                          <FiCheckCircle size={20} className="mr-2 text-primary" />
+                          <span className="font-medium">Cash on Delivery</span>
+                        </label>
+                      </div>
+
+                      {paymentMethod === 'cod' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 pl-7 text-sm text-gray-600"
+                        >
+                          <p>Pay with cash upon delivery of your order. Please ensure the exact amount is ready when the delivery arrives.</p>
+                          <p className="mt-2 text-primary font-medium">Available for orders under Rs. 100,000</p>
+                          {total > 100000 && (
+                            <p className="mt-2 text-red-500">Your order exceeds the Cash on Delivery limit. Please choose another payment method.</p>
+                          )}
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Terms and Conditions Checkbox */}
+                  <div className="mt-6">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      />
+                      <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+                        I agree to the <a href="#" className="text-primary">Terms and Conditions</a>, <a href="#" className="text-primary">Privacy Policy</a> and <a href="#" className="text-primary">Return Policy</a>
+                      </label>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Recently viewed or you might also like section */}
@@ -393,7 +1012,7 @@ const CartPage = () => {
                   to="/checkout" 
                   className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium flex items-center justify-center mb-4"
                 >
-                  Proceed to Checkout <FiArrowRight className="ml-2" />
+                  Place Order <FiArrowRight className="ml-2" />
                 </Link>
                 
                 <div className="flex flex-wrap justify-between items-center mb-4">
@@ -425,12 +1044,10 @@ const CartPage = () => {
       </div>
       
       {/* Service highlights and newsletter */}
-      <div className="mt-12">
+
         <ServiceHighlights />
-      </div>
-      <div className="mt-6">
         <Newsletter />
-      </div>
+
     </div>
   );
 };

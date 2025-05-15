@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiChevronDown, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiMenu, FiChevronDown, FiPhone, FiMapPin, FiPackage } from 'react-icons/fi';
 import logoImg from '../assets/logo.png';
 import { useSearch } from '../context/SearchContext';
 
-// Add category data
+// Categories data for the dropdown
 const categories = [
-  { name: 'TVs & Audio', link: '/category/electronics' },
-  { name: 'Phones & Gadgets', link: '/category/electronics' },
-  { name: 'Furniture', link: '/category/furniture' },
-  { name: 'Cooling', link: '/category/cooling' },
-  { name: 'Kitchen Appliances', link: '/category/kitchen' },
-  { name: 'Cameras', link: '/category/electronics' },
-  { name: 'Audio', link: '/category/electronics' },
-  { name: 'Wearables', link: '/category/electronics' },
-  { name: 'Lighting', link: '/category/furniture' },
-  { name: 'Office', link: '/category/furniture' },
-  { name: 'Decor', link: '/category/furniture' },
-  { name: 'Gifts', link: '/category/appliances' },
+  { name: 'Televisions', link: '/category/televisions' },
+  { name: 'Laptops', link: '/category/laptops' },
+  { name: 'Smartphones', link: '/category/smartphones' },
+  { name: 'Audio', link: '/category/audio' },
+  { name: 'Cameras', link: '/category/cameras' },
+  { name: 'Kitchen Appliances', link: '/category/kitchen-appliances' },
+  { name: 'Home Appliances', link: '/category/home-appliances' },
+  { name: 'Gaming', link: '/category/gaming' },
+  { name: 'Sofa Sets', link: '/category/sofa-sets' },
+  { name: 'Dining Tables', link: '/category/dining-tables' },
+  { name: 'Bedroom Furniture', link: '/category/bedroom-furniture' },
+  { name: 'Office Furniture', link: '/category/office-furniture' },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   
   // Use search context instead of local state
   const { searchQuery, setSearchQuery, performSearch } = useSearch();
@@ -36,7 +37,7 @@ const Navbar = () => {
   return (
     <>
       {/* Top navbar */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm relative z-50">
         <div className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {/* Logo */}
@@ -90,13 +91,68 @@ const Navbar = () => {
                 <span className="ml-1 text-sm font-medium">+94 112 222 888</span>
               </motion.div>
               
+              {/* User/Account section with dropdown */}
               <motion.div 
                 whileHover={{ scale: 1.05 }}
-                className="hidden md:flex items-center cursor-pointer"
+                className="hidden md:flex items-center cursor-pointer relative"
+                onMouseEnter={() => setIsUserMenuOpen(true)}
+                onMouseLeave={() => setIsUserMenuOpen(false)}
               >
                 <FiUser size={20} />
-                <Link to="/auth" className="ml-1 text-sm font-medium">Login</Link>
+                <span className="ml-1 text-sm font-medium">Account</span>
+                <FiChevronDown size={14} className="ml-1" />
+                
+                {/* User dropdown menu */}
+                <AnimatePresence>
+                  {isUserMenuOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full right-0 mt-1 w-48 bg-white shadow-lg rounded-md z-50"
+                    >
+                      <div className="py-1">
+                        <Link 
+                          to="/auth" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Login / Register
+                        </Link>
+                        <Link 
+                          to="/my-orders" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <span className="flex items-center">
+                            <FiPackage className="mr-2" />
+                            My Orders
+                          </span>
+                        </Link>
+                        <Link 
+                          to="/profile" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          My Profile
+                        </Link>
+                        <Link 
+                          to="/wishlist" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Wishlist
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
+              
+              {/* Mobile login link */}
+              <Link to="/auth" className="md:hidden flex items-center cursor-pointer">
+                <FiUser size={20} />
+              </Link>
               
               <Link to="/cart" className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -117,7 +173,7 @@ const Navbar = () => {
       </div>
       
       {/* Categories navbar */}
-      <div className="bg-primary text-white">
+      <div className="bg-primary text-white relative z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center h-10">
             <div className="hidden md:flex items-center space-x-6 text-sm">
@@ -169,9 +225,10 @@ const Navbar = () => {
             <div className="md:hidden flex-grow"></div>
             
             <div className="flex items-center space-x-4 ml-auto text-sm">
-              <div className="cursor-pointer flex items-center hover:underline">
+              <Link to="/my-orders" className="cursor-pointer flex items-center hover:underline">
+                <FiPackage className="mr-1" />
                 <span>Track your order</span>
-              </div>
+              </Link>
               <div className="hidden md:flex items-center cursor-pointer hover:underline">
                 <FiMapPin size={14} className="mr-1" />
                 <span>Find a Store</span>
@@ -186,7 +243,7 @@ const Navbar = () => {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="md:hidden bg-white border-b"
+          className="md:hidden bg-white border-b fixed top-[60px] left-0 right-0 z-50 shadow-lg"
         >
           <div className="container mx-auto px-4 py-3">
             <div className="flex flex-col space-y-3">
@@ -218,6 +275,14 @@ const Navbar = () => {
                 ))}
               </div>
               <Link to="/categories" onClick={() => setIsOpen(false)} className="text-primary text-center py-2">View All Categories</Link>
+              <Link 
+                to="/my-orders"
+                className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <FiPackage className="mr-2" />
+                My Orders
+              </Link>
               <div className="flex items-center justify-between border-t pt-2">
                 <div className="flex items-center">
                   <FiPhone size={16} className="text-primary" />
