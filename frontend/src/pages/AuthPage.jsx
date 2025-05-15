@@ -34,9 +34,38 @@ const AuthPage = () => {
     setShowPassword(!showPassword);
   };
 
+  // Enhanced animation variants for smoother transitions
   const variants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
+    hidden: (direction) => ({
+      opacity: 0,
+      x: direction === 'left' ? -30 : 30,
+      scale: 0.98,
+    }),
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24,
+        duration: 0.3,
+      }
+    },
+    exit: (direction) => ({
+      opacity: 0,
+      x: direction === 'left' ? 30 : -30,
+      scale: 0.98,
+      transition: { duration: 0.2 }
+    }),
+  };
+
+  // Determine animation direction based on tab change
+  const [direction, setDirection] = useState(null);
+
+  const handleTabChange = (tab) => {
+    setDirection(tab === 'login' ? 'left' : 'right');
+    setActiveTab(tab);
   };
 
   return (
@@ -69,27 +98,32 @@ const AuthPage = () => {
                     </svg>
                   </motion.div>
                   
-                  <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.8 }}
-                    className="text-3xl font-bold mb-6 text-center"
-                  >
-                    {activeTab === 'login' 
-                      ? 'Welcome Back!' 
-                      : 'Join Jayasinghe Storelines'}
-                  </motion.h1>
-                  
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
-                    className="text-center text-white/80 mb-8"
-                  >
-                    {activeTab === 'login'
-                      ? 'Access your account to track orders, manage your profile, and enjoy a personalized shopping experience.'
-                      : 'Create an account to enjoy exclusive member benefits, fast checkout, and special discounts on premium products.'}
-                  </motion.p>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                      className="text-center"
+                    >
+                      <motion.h1
+                        className="text-3xl font-bold mb-6"
+                      >
+                        {activeTab === 'login' 
+                          ? 'Welcome Back!' 
+                          : 'Join Jayasinghe Storelines'}
+                      </motion.h1>
+                      
+                      <motion.p
+                        className="text-white/80 mb-8"
+                      >
+                        {activeTab === 'login'
+                          ? 'Access your account to track orders, manage your profile, and enjoy a personalized shopping experience.'
+                          : 'Create an account to enjoy exclusive member benefits, fast checkout, and special discounts on premium products.'}
+                      </motion.p>
+                    </motion.div>
+                  </AnimatePresence>
                   
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -97,37 +131,47 @@ const AuthPage = () => {
                     transition={{ delay: 0.8, duration: 0.8 }}
                     className="grid grid-cols-1 gap-4 w-full max-w-xs"
                   >
-                    {activeTab === 'login' ? (
-                      <>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Track your order status</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Access exclusive offers</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Save your wishlist</span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Fast checkout process</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Member-only discounts</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <FiCheck className="text-secondary" />
-                          <span>Premium support access</span>
-                        </div>
-                      </>
-                    )}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {activeTab === 'login' ? (
+                          <div className="space-y-3">
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Track your order status</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Access exclusive offers</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Save your wishlist</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Fast checkout process</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Member-only discounts</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <FiCheck className="text-secondary" />
+                              <span>Premium support access</span>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
                   </motion.div>
                 </div>
                 
@@ -142,7 +186,8 @@ const AuthPage = () => {
                 <div className="flex space-x-4 mb-8 justify-center md:justify-start">
                   <motion.button
                     whileHover={{ y: -2 }}
-                    onClick={() => setActiveTab('login')}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleTabChange('login')}
                     className={`px-6 py-2 rounded-full font-medium transition-colors ${
                       activeTab === 'login'
                         ? 'bg-primary text-white'
@@ -153,7 +198,8 @@ const AuthPage = () => {
                   </motion.button>
                   <motion.button
                     whileHover={{ y: -2 }}
-                    onClick={() => setActiveTab('register')}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleTabChange('register')}
                     className={`px-6 py-2 rounded-full font-medium transition-colors ${
                       activeTab === 'register'
                         ? 'bg-primary text-white'
@@ -164,18 +210,24 @@ const AuthPage = () => {
                   </motion.button>
                 </div>
                 
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" custom={direction}>
                   <motion.div
                     key={activeTab}
+                    custom={direction}
+                    variants={variants}
                     initial="hidden"
                     animate="visible"
-                    exit="hidden"
-                    variants={variants}
-                    transition={{ duration: 0.3 }}
+                    exit="exit"
+                    className="overflow-hidden"
                   >
                     <form onSubmit={handleSubmit}>
                       {activeTab === 'register' && (
-                        <div className="mb-4">
+                        <motion.div 
+                          className="mb-4"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          transition={{ duration: 0.3 }}
+                        >
                           <label className="block text-gray-700 text-sm font-medium mb-2">
                             Full Name
                           </label>
@@ -193,7 +245,7 @@ const AuthPage = () => {
                               required
                             />
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                       
                       <div className="mb-4">
@@ -244,7 +296,12 @@ const AuthPage = () => {
                       </div>
                       
                       {activeTab === 'register' && (
-                        <div className="mb-4">
+                        <motion.div 
+                          className="mb-4"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          transition={{ duration: 0.3 }}
+                        >
                           <label className="block text-gray-700 text-sm font-medium mb-2">
                             Confirm Password
                           </label>
@@ -262,11 +319,16 @@ const AuthPage = () => {
                               required
                             />
                           </div>
-                        </div>
+                        </motion.div>
                       )}
                       
                       {activeTab === 'login' && (
-                        <div className="flex items-center justify-between mb-6">
+                        <motion.div 
+                          className="flex items-center justify-between mb-6"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
                           <div className="flex items-center">
                             <input
                               type="checkbox"
@@ -283,7 +345,7 @@ const AuthPage = () => {
                           <a href="#" className="text-sm text-primary hover:text-blue-800">
                             Forgot password?
                           </a>
-                        </div>
+                        </motion.div>
                       )}
                       
                       <motion.button
