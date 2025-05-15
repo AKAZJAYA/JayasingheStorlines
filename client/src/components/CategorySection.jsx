@@ -5,7 +5,7 @@ import { FiMonitor, FiSmartphone, FiHome, FiWind, FiCoffee, FiCamera, FiHeadphon
 
 const categories = [
   { name: 'TVs & Audio', icon: <FiMonitor size={24} />, color: 'bg-blue-500', link: '/category/electronics' },
-  { name: 'Phones & Gadgets', icon: <FiSmartphone size={24} />, color: 'bg-yellow-500', link: '/category/electronics' },
+  { name: 'Phones', icon: <FiSmartphone size={24} />, color: 'bg-yellow-500', link: '/category/electronics' },
   { name: 'Furniture', icon: <FiHome size={24} />, color: 'bg-red-500', link: '/category/furniture' },
   { name: 'Cooling', icon: <FiWind size={24} />, color: 'bg-blue-600', link: '/category/cooling' },
   { name: 'Kitchen', icon: <FiCoffee size={24} />, color: 'bg-yellow-600', link: '/category/kitchen' },

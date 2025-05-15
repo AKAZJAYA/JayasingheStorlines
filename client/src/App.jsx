@@ -12,13 +12,9 @@ import ProfilePage from "./pages/ProfilePage";
 import WishlistPage from "./pages/WishlistPage";
 import StoreLocatorPage from "./pages/StoreLocatorPage";
 import { SearchProvider } from "./context/SearchContext";
-import BrandShowcase from "./components/BrandShowcase";
-import CategorySection from "./components/CategorySection";
-import FeaturedProducts from "./components/FeaturedProducts";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import SpecialOffers from "./pages/SpecialOffers";
-import TrackOrder from "./pages/TrackOrder";
 import Careers from "./pages/Careers";
 import FAQ from "./pages/FAQ";
 import ShippingReturns from "./pages/ShippingReturns";
@@ -38,11 +34,7 @@ const App = () => {
               <Route
                 path="/"
                 element={
-                  <>
-                    <FeaturedProducts />
-                    <CategorySection />
-                    <BrandShowcase />
-                  </>
+                  <HomePage />
                 }
               />
               <Route path="/category/:category" element={<CategoryPage />} />
@@ -56,7 +48,6 @@ const App = () => {
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/special-offers" element={<SpecialOffers />} />
-              <Route path="/track-order" element={<TrackOrder />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/shipping-returns" element={<ShippingReturns />} />

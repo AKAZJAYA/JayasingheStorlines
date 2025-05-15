@@ -260,13 +260,10 @@ const Navbar = () => {
                 Appliances
               </Link>
               <Link
-                to="/category/offers"
+                to="/special-offers"
                 className="cursor-pointer hover:underline"
               >
                 Special Offers
-              </Link>
-              <Link to="/services" className="cursor-pointer hover:underline">
-                Premium Service
               </Link>
             </div>
 

@@ -5,6 +5,15 @@ import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 import logoImg from '../assets/logo.png';
 
 const Footer = () => {
+  // Function to handle link clicks and scroll to top with animation
+  const handleLinkClick = () => {
+    // Animate scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // This creates the smooth animation effect
+    });
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300 pt-10">
       <div className="container mx-auto px-4">
@@ -44,23 +53,23 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/about-us" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/contact-us" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link to="/special-offers" className="text-gray-400 hover:text-white transition-colors">Special Offers</Link></li>
-              <li><Link to="/my-orders" className="text-gray-400 hover:text-white transition-colors">Track Order</Link></li>
-              <li><Link to="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
+              <li><Link to="/about-us" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact-us" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link to="/special-offers" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Special Offers</Link></li>
+              <li><Link to="/my-orders" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link to="/careers" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Customer Service</h3>
             <ul className="space-y-2">
-              <li><Link to="/faq" className="text-gray-400 hover:text-white transition-colors">FAQs</Link></li>
-              <li><Link to="/shipping-returns" className="text-gray-400 hover:text-white transition-colors">Shipping & Returns</Link></li>
-              <li><Link to="/terms-conditions" className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
-              <li><Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/payment-methods" className="text-gray-400 hover:text-white transition-colors">Payment Methods</Link></li>
-              <li><Link to="/warranty-information" className="text-gray-400 hover:text-white transition-colors">Warranty Information</Link></li>
+              <li><Link to="/faq" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">FAQs</Link></li>
+              <li><Link to="/shipping-returns" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Shipping & Returns</Link></li>
+              <li><Link to="/terms-conditions" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/privacy-policy" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/payment-methods" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Payment Methods</Link></li>
+              <li><Link to="/warranty-information" onClick={handleLinkClick} className="text-gray-400 hover:text-white transition-colors">Warranty Information</Link></li>
             </ul>
           </div>
           
