@@ -98,16 +98,13 @@ const Navbar = () => {
                 <Link to="/auth" className="ml-1 text-sm font-medium">Login</Link>
               </motion.div>
               
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center cursor-pointer"
-              >
+              <Link to="/cart" className="flex items-center cursor-pointer">
                 <div className="relative">
                   <FiShoppingCart size={20} />
-                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
                 </div>
                 <span className="ml-1 text-sm font-medium hidden md:inline">Cart</span>
-              </motion.div>
+              </Link>
               
               <div className="md:hidden">
                 <button onClick={() => setIsOpen(!isOpen)}>

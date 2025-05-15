@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import AuthPage from "./pages/AuthPage";
+import CartPage from "./pages/CartPage";
 import { useSearch } from "./context/SearchContext";
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
             <Route path="/category/:category" element={<CategoryPage />} />
             <Route path="/product/:productId" element={<ProductDetailsPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/cart" element={<CartPage />} />
           </Routes>
         </main>
         <Footer />
