@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
 import logoImg from '../assets/logo.png';
@@ -22,19 +23,19 @@ const Footer = () => {
             </div>
             <p className="mb-4">Your premier destination for world-class electronics and furniture, offering exceptional quality, design, and value.</p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <FaFacebook size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <FaTwitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <FaInstagram size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <FaLinkedin size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <FaYoutube size={20} />
               </a>
             </div>
@@ -43,24 +44,23 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Products</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Special Offers</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Track Order</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+              <li><Link to="/about-us" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact-us" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link to="/special-offers" className="text-gray-400 hover:text-white transition-colors">Special Offers</Link></li>
+              <li><Link to="/my-orders" className="text-gray-400 hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link to="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Customer Service</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQs</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Shipping & Returns</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Payment Methods</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Warranty Information</a></li>
+              <li><Link to="/faq" className="text-gray-400 hover:text-white transition-colors">FAQs</Link></li>
+              <li><Link to="/shipping-returns" className="text-gray-400 hover:text-white transition-colors">Shipping & Returns</Link></li>
+              <li><Link to="/terms-conditions" className="text-gray-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/payment-methods" className="text-gray-400 hover:text-white transition-colors">Payment Methods</Link></li>
+              <li><Link to="/warranty-information" className="text-gray-400 hover:text-white transition-colors">Warranty Information</Link></li>
             </ul>
           </div>
           
