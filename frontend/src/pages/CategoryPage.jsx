@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiFilter, FiGrid, FiList, FiChevronDown } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
@@ -173,17 +173,21 @@ const CategoryPage = () => {
                 transition={{ duration: 0.4 }}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
               >
-                <div className="aspect-square bg-gray-100">
-                  <img 
-                    src={`${product.image}?w=400&fit=crop`} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
-                  <p className="font-bold text-primary">Rs. {product.price.toLocaleString()}</p>
-                  <button className="w-full mt-3 bg-primary text-white py-2 rounded-md font-medium">
+                <Link to={`/product/tv`} className="block">
+                  <div className="aspect-square bg-gray-100">
+                    <img 
+                      src={`${product.image}?w=400&fit=crop`} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-medium text-gray-900 mb-1">{product.name}</h3>
+                    <p className="font-bold text-primary">Rs. {product.price.toLocaleString()}</p>
+                  </div>
+                </Link>
+                <div className="px-4 pb-4">
+                  <button className="w-full bg-primary text-white py-2 rounded-md font-medium">
                     Add to Cart
                   </button>
                 </div>

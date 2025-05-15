@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiChevronRight, FiHeart } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const products = [
   {
@@ -60,25 +61,29 @@ const ProductCard = ({ product, index }) => (
       </div>
     )}
     
-    <div className="relative pt-[75%] bg-gray-100">
-      <motion.img 
-        whileHover={{ scale: 1.05 }}
-        src={product.image} 
-        alt={product.name} 
-        className="absolute inset-0 w-full h-full object-contain p-4"
-      />
-      <button className="absolute top-2 right-2 p-2 rounded-full bg-white text-gray-500 hover:text-accent">
-        <FiHeart />
-      </button>
-    </div>
-    <div className="p-4">
-      <h3 className="font-medium text-gray-900 mb-1 truncate">{product.name}</h3>
-      <div className="flex items-center space-x-2">
-        <span className="font-bold text-primary">Rs. {(product.discountedPrice).toLocaleString()}</span>
-        {product.discount > 0 && (
-          <span className="text-gray-500 text-sm line-through">Rs. {(product.originalPrice).toLocaleString()}</span>
-        )}
+    <Link to={`/product/${product.id || 'tv'}`} className="block">
+      <div className="relative pt-[75%] bg-gray-100">
+        <motion.img 
+          whileHover={{ scale: 1.05 }}
+          src={product.image} 
+          alt={product.name} 
+          className="absolute inset-0 w-full h-full object-contain p-4"
+        />
+        <button className="absolute top-2 right-2 p-2 rounded-full bg-white text-gray-500 hover:text-accent">
+          <FiHeart />
+        </button>
       </div>
+      <div className="p-4">
+        <h3 className="font-medium text-gray-900 mb-1 truncate">{product.name}</h3>
+        <div className="flex items-center space-x-2">
+          <span className="font-bold text-primary">Rs. {(product.discountedPrice).toLocaleString()}</span>
+          {product.discount > 0 && (
+            <span className="text-gray-500 text-sm line-through">Rs. {(product.originalPrice).toLocaleString()}</span>
+          )}
+        </div>
+      </div>
+    </Link>
+    <div className="px-4 pb-4">
       <motion.button
         whileHover={{ scale: 1.02 }}
         className="w-full mt-3 bg-primary text-white py-2 rounded-md font-medium"
