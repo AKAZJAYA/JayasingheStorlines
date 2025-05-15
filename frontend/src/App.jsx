@@ -10,6 +10,7 @@ import CartPage from "./pages/CartPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import WishlistPage from "./pages/WishlistPage";
+import StoreLocatorPage from "./pages/StoreLocatorPage";
 import { SearchProvider } from "./context/SearchContext";
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
               <Route path="/my-orders" element={<MyOrdersPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/store-locator" element={<StoreLocatorPage />} />
             </Routes>
           </main>
           <Footer />

@@ -278,11 +278,11 @@ const Navbar = () => {
                 className="cursor-pointer flex items-center hover:underline"
               >
                 <FiPackage className="mr-1" />
-                <span>Track your order</span>
+                <span>Track your orders</span>
               </Link>
               <div className="hidden md:flex items-center cursor-pointer hover:underline">
                 <FiMapPin size={14} className="mr-1" />
-                <span>Find a Store</span>
+                <Link to="/store-locator">Find the Store</Link>
               </div>
             </div>
           </div>
@@ -363,7 +363,7 @@ const Navbar = () => {
                 </div>
                 <div className="flex items-center">
                   <FiMapPin size={16} className="text-primary" />
-                  <span className="ml-1 text-sm">Find a Store</span>
+                  <Link to="/store-locator" className="ml-1 text-sm">Find a Store</Link>
                 </div>
               </div>
             </div>
