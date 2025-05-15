@@ -7,7 +7,7 @@ import OrderManagement from './pages/OrderManagement';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Layout from './components/Layout';
-// import { AuthProvider } from './context/AuthContext';
+import SalesManagement from './pages/SalesManagement';
 
 const App = () => {
   return (
@@ -20,6 +20,7 @@ const App = () => {
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductManagement />} />
             <Route path="orders" element={<OrderManagement />} />
+            <Route path="sales" element={<SalesManagement />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
