@@ -9,10 +9,14 @@ import { sendEmail } from '../utils/email.js';
 // @route   POST /api/users/register
 // @access  Public
 export const register = asyncHandler(async (req, res) => {
+  console.log('Register endpoint hit');
+  console.log('Request body:', req.body);
+  
   const { name, email, password, phone } = req.body;
 
   // Validation
   if (!name || !email || !password) {
+    console.log('Missing required fields');
     return res.status(400).json({
       success: false,
       message: 'Please provide name, email and password'
