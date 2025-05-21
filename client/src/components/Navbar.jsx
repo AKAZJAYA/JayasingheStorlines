@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,6 +16,16 @@ import {
 import logoImg from "../assets/logo.png";
 import { useSearch } from "../context/SearchContext";
 import { useSelector, useDispatch } from "react-redux";
+import {
+  toggleNavbar,
+  closeNavbar,
+  toggleCategoryMenu,
+  closeCategoryMenu,
+  toggleUserMenu,
+  closeUserMenu,
+  setSearchResults,
+  setIsSearching,
+} from "../store/slices/uiSlice";
 import { logout } from "../store/slices/authSlice";
 
 // Categories data for the dropdown
@@ -35,23 +45,51 @@ const categories = [
 ];
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
-  // Use search context instead of local state
-  const { searchQuery, setSearchQuery, performSearch } = useSearch();
-
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const {
+    isNavbarOpen,
+    isCategoryMenuOpen,
+    isUserMenuOpen,
+    searchResults,
+    isSearching,
+  } = useSelector((state) => state.ui);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { items } = useSelector((state) => state.cart);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { setSearchTerm } = useSearch();
+
+  // Replace local state handlers with Redux actions
+  const handleToggleMenu = () => dispatch(toggleNavbar());
+  const handleCategoryHover = () => dispatch(toggleCategoryMenu());
+  const handleUserMenuToggle = () => dispatch(toggleUserMenu());
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      dispatch(closeNavbar());
+      dispatch(closeCategoryMenu());
+      dispatch(closeUserMenu());
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dispatch]);
+
+  // Handle logout
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(closeUserMenu());
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    performSearch(searchQuery);
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
+    setSearchTerm(searchQuery);
+    dispatch(setIsSearching(true));
+    // Simulate search results
+    setTimeout(() => {
+      dispatch(setSearchResults(["Result 1", "Result 2", "Result 3"]));
+      dispatch(setIsSearching(false));
+    }, 1000);
   };
 
   return (
@@ -119,8 +157,8 @@ const Navbar = () => {
               {isAuthenticated ? (
                 <motion.div
                   className="hidden md:flex items-center cursor-pointer relative"
-                  onMouseEnter={() => setIsUserMenuOpen(true)}
-                  onMouseLeave={() => setIsUserMenuOpen(false)}
+                  onMouseEnter={handleUserMenuToggle}
+                  onMouseLeave={() => dispatch(closeUserMenu())}
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary">
                     <img
@@ -147,7 +185,7 @@ const Navbar = () => {
                           <Link
                             to="/profile"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsUserMenuOpen(false)}
+                            onClick={() => dispatch(closeUserMenu())}
                           >
                             <span className="flex items-center">
                               <FiUser className="mr-2" />
@@ -157,7 +195,7 @@ const Navbar = () => {
                           <Link
                             to="/my-orders"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsUserMenuOpen(false)}
+                            onClick={() => dispatch(closeUserMenu())}
                           >
                             <span className="flex items-center">
                               <FiPackage className="mr-2" />
@@ -167,7 +205,7 @@ const Navbar = () => {
                           <Link
                             to="/wishlist"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsUserMenuOpen(false)}
+                            onClick={() => dispatch(closeUserMenu())}
                           >
                             <span className="flex items-center">
                               <FiHeart className="mr-2" />
@@ -176,10 +214,7 @@ const Navbar = () => {
                           </Link>
                           <button
                             className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                            onClick={() => {
-                              setIsUserMenuOpen(false);
-                              handleLogout();
-                            }}
+                            onClick={handleLogout}
                           >
                             <span className="flex items-center">
                               <FiLogOut className="mr-2" />
@@ -213,7 +248,7 @@ const Navbar = () => {
                 <div className="relative">
                   <FiShoppingCart size={20} />
                   <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    2
+                    {items.length}
                   </span>
                 </div>
                 <span className="ml-1 text-sm font-medium hidden md:inline">
@@ -222,7 +257,7 @@ const Navbar = () => {
               </Link>
 
               <div className="md:hidden">
-                <button onClick={() => setIsOpen(!isOpen)}>
+                <button onClick={handleToggleMenu}>
                   <FiMenu size={24} />
                 </button>
               </div>
@@ -238,21 +273,21 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-6 text-sm">
               <div
                 className="relative flex items-center cursor-pointer h-full"
-                onMouseEnter={() => setIsCategoryOpen(true)}
-                onMouseLeave={() => setIsCategoryOpen(false)}
+                onMouseEnter={handleCategoryHover}
+                onMouseLeave={() => dispatch(closeCategoryMenu())}
               >
                 <FiMenu className="mr-2" />
                 <span>All Categories</span>
                 <FiChevronDown
                   size={14}
                   className={`ml-1 transition-transform duration-200 ${
-                    isCategoryOpen ? "rotate-180" : ""
+                    isCategoryMenuOpen ? "rotate-180" : ""
                   }`}
                 />
 
                 {/* Dropdown menu */}
                 <AnimatePresence>
-                  {isCategoryOpen && (
+                  {isCategoryMenuOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -268,7 +303,7 @@ const Navbar = () => {
                             <Link
                               to={category.link}
                               className="block px-3 py-2 rounded-md text-gray-800 hover:text-primary transition-colors"
-                              onClick={() => setIsCategoryOpen(false)}
+                              onClick={() => dispatch(closeCategoryMenu())}
                             >
                               {category.name}
                             </Link>
@@ -325,7 +360,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu */}
-      {isOpen && (
+      {isNavbarOpen && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
@@ -354,7 +389,7 @@ const Navbar = () => {
                     key={category.name}
                     to={category.link}
                     className="p-2 border rounded-md text-center hover:bg-gray-50 hover:border-primary transition-colors"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => dispatch(closeNavbar())}
                   >
                     {category.name}
                   </Link>
@@ -362,7 +397,7 @@ const Navbar = () => {
               </div>
               <Link
                 to="/categories"
-                onClick={() => setIsOpen(false)}
+                onClick={() => dispatch(closeNavbar())}
                 className="text-primary text-center py-2"
               >
                 View All Categories
@@ -370,7 +405,7 @@ const Navbar = () => {
               <Link
                 to="/my-orders"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={() => dispatch(closeNavbar())}
               >
                 <FiPackage className="mr-2" />
                 My Orders
@@ -378,7 +413,7 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={() => dispatch(closeNavbar())}
               >
                 <FiUser className="mr-2" />
                 My Profile
@@ -386,7 +421,7 @@ const Navbar = () => {
               <Link
                 to="/wishlist"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={() => dispatch(closeNavbar())}
               >
                 <FiHeart className="mr-2" />
                 My Wishlist
