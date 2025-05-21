@@ -27,50 +27,52 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <SearchProvider>
-        <AuthCheck />
-        <div className="min-h-screen flex flex-col">
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/category/:category" element={<CategoryPage />} />
-              <Route
-                path="/product/:productId"
-                element={<ProductDetailsPage />}
-              />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/cart" element={<CartPage />} />
+    <>
+      <AuthCheck />
+      <BrowserRouter>
+        <SearchProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/category/:category" element={<CategoryPage />} />
+                <Route
+                  path="/product/:productId"
+                  element={<ProductDetailsPage />}
+                />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/cart" element={<CartPage />} />
 
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/my-orders" element={<MyOrdersPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/wishlist" element={<WishlistPage />} />
-              </Route>
+                {/* Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/my-orders" element={<MyOrdersPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                </Route>
 
-              {/* Public Routes */}
-              <Route path="/store-locator" element={<StoreLocatorPage />} />
-              <Route path="/about-us" element={<AboutUs />} />
-              <Route path="/contact-us" element={<ContactUs />} />
-              <Route path="/special-offers" element={<SpecialOffers />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/shipping-returns" element={<ShippingReturns />} />
-              <Route path="/terms-conditions" element={<TermsConditions />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/payment-methods" element={<PaymentMethods />} />
-              <Route
-                path="/warranty-information"
-                element={<WarrantyInformation />}
-              />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </SearchProvider>
-    </BrowserRouter>
+                {/* Public Routes */}
+                <Route path="/store-locator" element={<StoreLocatorPage />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/contact-us" element={<ContactUs />} />
+                <Route path="/special-offers" element={<SpecialOffers />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/shipping-returns" element={<ShippingReturns />} />
+                <Route path="/terms-conditions" element={<TermsConditions />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/payment-methods" element={<PaymentMethods />} />
+                <Route
+                  path="/warranty-information"
+                  element={<WarrantyInformation />}
+                />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </SearchProvider>
+      </BrowserRouter>
+    </>
   );
 };
 

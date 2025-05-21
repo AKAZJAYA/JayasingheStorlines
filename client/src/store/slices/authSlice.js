@@ -49,11 +49,24 @@ export const getProfile = createAsyncThunk(
   "auth/getProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/users/profile");
-      return response.data;
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      // Set token in headers for the request
+      const response = await api.get("/users/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.user;
     } catch (error) {
+      // If token is invalid, clear it
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+      }
       return rejectWithValue(
-        error.response?.data || { message: "Failed to fetch profile" }
+        error.response?.data || { message: error.message }
       );
     }
   }
