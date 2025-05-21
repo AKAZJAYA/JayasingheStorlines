@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FiUser,
   FiLock,
@@ -40,12 +40,16 @@ const AuthPage = () => {
   });
   const [direction, setDirection] = useState(null);
 
-  // Redirect if authenticated
+  const location = useLocation();
+
+  // Modify the useEffect for redirect:
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/profile");
+      // If there's a saved location, redirect there, otherwise go to profile
+      const from = location.state?.from || "/profile";
+      navigate(from);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location]);
 
   // Clear error/message when tab changes
   useEffect(() => {
