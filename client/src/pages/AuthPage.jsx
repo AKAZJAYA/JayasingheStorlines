@@ -1,44 +1,104 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { FiUser, FiLock, FiMail, FiEye, FiEyeOff, FiArrowRight, FiCheck } from 'react-icons/fi';
-import { FaGoogle, FaFacebook, FaApple } from 'react-icons/fa';
-import ServiceHighlights from '../components/ServiceHighlights';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FiUser,
+  FiLock,
+  FiMail,
+  FiEye,
+  FiEyeOff,
+  FiArrowRight,
+  FiCheck,
+  FiAlertCircle,
+} from "react-icons/fi";
+import { FaGoogle, FaFacebook, FaApple } from "react-icons/fa";
+import ServiceHighlights from "../components/ServiceHighlights";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  login,
+  register,
+  clearError,
+  clearMessage,
+} from "../store/slices/authSlice";
 
 const AuthPage = () => {
-  const [activeTab, setActiveTab] = useState('login');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error, message, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+
+  const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    name: "",
+    confirmPassword: "",
     rememberMe: false,
+    phone: "",
   });
+  const [direction, setDirection] = useState(null);
+
+  // Redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/profile");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear error/message when tab changes
+  useEffect(() => {
+    if (error) dispatch(clearError());
+    if (message) dispatch(clearMessage());
+  }, [activeTab, dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login/register logic here
-    console.log('Form submitted:', formData);
+
+    if (activeTab === "login") {
+      // Login logic
+      dispatch(
+        login({
+          email: formData.email,
+          password: formData.password,
+        })
+      );
+    } else {
+      // Register logic
+      if (formData.password !== formData.confirmPassword) {
+        // Handle password mismatch locally
+        return;
+      }
+
+      dispatch(
+        register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+        })
+      );
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // Enhanced animation variants for smoother transitions
+  // Animation variants
   const variants = {
     hidden: (direction) => ({
       opacity: 0,
-      x: direction === 'left' ? -30 : 30,
+      x: direction === "left" ? -30 : 30,
       scale: 0.98,
     }),
     visible: {
@@ -50,21 +110,18 @@ const AuthPage = () => {
         stiffness: 300,
         damping: 24,
         duration: 0.3,
-      }
+      },
     },
     exit: (direction) => ({
       opacity: 0,
-      x: direction === 'left' ? 30 : -30,
+      x: direction === "left" ? 30 : -30,
       scale: 0.98,
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     }),
   };
 
-  // Determine animation direction based on tab change
-  const [direction, setDirection] = useState(null);
-
   const handleTabChange = (tab) => {
-    setDirection(tab === 'login' ? 'left' : 'right');
+    setDirection(tab === "login" ? "left" : "right");
     setActiveTab(tab);
   };
 
@@ -84,20 +141,30 @@ const AuthPage = () => {
                     transition={{ delay: 0.2, duration: 0.8 }}
                     className="mb-8"
                   >
-                    <svg className="w-32 h-32 text-white/90" viewBox="0 0 256 256" fill="none">
-                      <circle cx="128" cy="128" r="120" stroke="currentColor" strokeWidth="12" />
-                      <motion.circle 
-                        cx="128" 
-                        cy="128" 
-                        r="80" 
-                        fill="currentColor" 
+                    <svg
+                      className="w-32 h-32 text-white/90"
+                      viewBox="0 0 256 256"
+                      fill="none"
+                    >
+                      <circle
+                        cx="128"
+                        cy="128"
+                        r="120"
+                        stroke="currentColor"
+                        strokeWidth="12"
+                      />
+                      <motion.circle
+                        cx="128"
+                        cy="128"
+                        r="80"
+                        fill="currentColor"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.8, duration: 1, type: "spring" }}
                       />
                     </svg>
                   </motion.div>
-                  
+
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
@@ -107,24 +174,20 @@ const AuthPage = () => {
                       transition={{ duration: 0.4 }}
                       className="text-center"
                     >
-                      <motion.h1
-                        className="text-3xl font-bold mb-6"
-                      >
-                        {activeTab === 'login' 
-                          ? 'Welcome Back!' 
-                          : 'Join Jayasinghe Storelines'}
+                      <motion.h1 className="text-3xl font-bold mb-6">
+                        {activeTab === "login"
+                          ? "Welcome Back!"
+                          : "Join Jayasinghe Storelines"}
                       </motion.h1>
-                      
-                      <motion.p
-                        className="text-white/80 mb-8"
-                      >
-                        {activeTab === 'login'
-                          ? 'Access your account to track orders, manage your profile, and enjoy a personalized shopping experience.'
-                          : 'Create an account to enjoy exclusive member benefits, fast checkout, and special discounts on premium products.'}
+
+                      <motion.p className="text-white/80 mb-8">
+                        {activeTab === "login"
+                          ? "Access your account to track orders, manage your profile, and enjoy a personalized shopping experience."
+                          : "Create an account to enjoy exclusive member benefits, fast checkout, and special discounts on premium products."}
                       </motion.p>
                     </motion.div>
                   </AnimatePresence>
-                  
+
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -139,7 +202,7 @@ const AuthPage = () => {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        {activeTab === 'login' ? (
+                        {activeTab === "login" ? (
                           <div className="space-y-3">
                             <div className="flex items-center space-x-3">
                               <FiCheck className="text-secondary" />
@@ -174,12 +237,12 @@ const AuthPage = () => {
                     </AnimatePresence>
                   </motion.div>
                 </div>
-                
+
                 {/* Decorative elements */}
                 <div className="absolute top-0 left-0 w-40 h-40 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2" />
                 <div className="absolute bottom-0 right-0 w-60 h-60 bg-white opacity-10 rounded-full translate-x-1/4 translate-y-1/4" />
               </div>
-              
+
               {/* Right Panel - Form */}
               <div className="md:w-1/2 p-8 md:p-12">
                 {/* Tabs */}
@@ -187,11 +250,11 @@ const AuthPage = () => {
                   <motion.button
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleTabChange('login')}
+                    onClick={() => handleTabChange("login")}
                     className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                      activeTab === 'login'
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      activeTab === "login"
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                     }`}
                   >
                     Sign In
@@ -199,17 +262,41 @@ const AuthPage = () => {
                   <motion.button
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleTabChange('register')}
+                    onClick={() => handleTabChange("register")}
                     className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                      activeTab === 'register'
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      activeTab === "register"
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                     }`}
                   >
                     Register
                   </motion.button>
                 </div>
-                
+
+                {/* Error message */}
+                {error && (
+                  <motion.div
+                    className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg flex items-center"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                  >
+                    <FiAlertCircle className="mr-2 flex-shrink-0" />
+                    <span>{error}</span>
+                  </motion.div>
+                )}
+
+                {/* Success message */}
+                {message && (
+                  <motion.div
+                    className="mb-6 p-3 bg-green-50 border border-green-200 text-green-600 rounded-lg flex items-center"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                  >
+                    <FiCheck className="mr-2 flex-shrink-0" />
+                    <span>{message}</span>
+                  </motion.div>
+                )}
+
                 <AnimatePresence mode="wait" custom={direction}>
                   <motion.div
                     key={activeTab}
@@ -221,33 +308,59 @@ const AuthPage = () => {
                     className="overflow-hidden"
                   >
                     <form onSubmit={handleSubmit}>
-                      {activeTab === 'register' && (
-                        <motion.div 
-                          className="mb-4"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <label className="block text-gray-700 text-sm font-medium mb-2">
-                            Full Name
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <FiUser className="text-gray-400" />
+                      {activeTab === "register" && (
+                        <>
+                          <motion.div
+                            className="mb-4"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Full Name
+                            </label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FiUser className="text-gray-400" />
+                              </div>
+                              <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Enter your full name"
+                                required
+                              />
                             </div>
-                            <input
-                              type="text"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleInputChange}
-                              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                              placeholder="Enter your full name"
-                              required
-                            />
-                          </div>
-                        </motion.div>
+                          </motion.div>
+
+                          <motion.div
+                            className="mb-4"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <label className="block text-gray-700 text-sm font-medium mb-2">
+                              Phone Number
+                            </label>
+                            <div className="relative">
+                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FiUser className="text-gray-400" />
+                              </div>
+                              <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="Enter your phone number"
+                              />
+                            </div>
+                          </motion.div>
+                        </>
                       )}
-                      
+
                       <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           Email Address
@@ -267,7 +380,7 @@ const AuthPage = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           Password
@@ -290,16 +403,20 @@ const AuthPage = () => {
                             onClick={togglePasswordVisibility}
                             className="absolute inset-y-0 right-0 pr-3 flex items-center"
                           >
-                            {showPassword ? <FiEyeOff className="text-gray-400" /> : <FiEye className="text-gray-400" />}
+                            {showPassword ? (
+                              <FiEyeOff className="text-gray-400" />
+                            ) : (
+                              <FiEye className="text-gray-400" />
+                            )}
                           </button>
                         </div>
                       </div>
-                      
-                      {activeTab === 'register' && (
-                        <motion.div 
+
+                      {activeTab === "register" && (
+                        <motion.div
                           className="mb-4"
                           initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
+                          animate={{ opacity: 1, height: "auto" }}
                           transition={{ duration: 0.3 }}
                         >
                           <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -321,9 +438,9 @@ const AuthPage = () => {
                           </div>
                         </motion.div>
                       )}
-                      
-                      {activeTab === 'login' && (
-                        <motion.div 
+
+                      {activeTab === "login" && (
+                        <motion.div
                           className="flex items-center justify-between mb-6"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -338,37 +455,54 @@ const AuthPage = () => {
                               onChange={handleInputChange}
                               className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                             />
-                            <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                            <label
+                              htmlFor="rememberMe"
+                              className="ml-2 block text-sm text-gray-700"
+                            >
                               Remember me
                             </label>
                           </div>
-                          <a href="#" className="text-sm text-primary hover:text-blue-800">
+                          <Link
+                            to="/forgot-password"
+                            className="text-sm text-primary hover:text-blue-800"
+                          >
                             Forgot password?
-                          </a>
+                          </Link>
                         </motion.div>
                       )}
-                      
+
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         type="submit"
+                        disabled={loading}
                         className="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center"
                       >
-                        {activeTab === 'login' ? 'Sign In' : 'Create Account'}
-                        <FiArrowRight className="ml-2" />
+                        {loading ? (
+                          <span>Please wait...</span>
+                        ) : (
+                          <>
+                            {activeTab === "login"
+                              ? "Sign In"
+                              : "Create Account"}
+                            <FiArrowRight className="ml-2" />
+                          </>
+                        )}
                       </motion.button>
                     </form>
-                    
+
                     <div className="mt-6">
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                           <div className="w-full border-t border-gray-300"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                          <span className="px-4 bg-white text-gray-500">Or continue with</span>
+                          <span className="px-4 bg-white text-gray-500">
+                            Or continue with
+                          </span>
                         </div>
                       </div>
-                      
+
                       <div className="mt-6 grid grid-cols-3 gap-3">
                         <motion.button
                           whileHover={{ y: -2 }}
@@ -401,7 +535,7 @@ const AuthPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Trust badges */}
           <div className="mt-12">
             <ServiceHighlights />

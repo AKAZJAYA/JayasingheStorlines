@@ -1,15 +1,10 @@
 import axios from "axios";
 
-// Create an axios instance with custom config
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // Update this to your backend server port
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "http://localhost:8080/api", // Adjust based on your API URL setup
 });
 
-// Add a request interceptor to add the auth token to requests
+// Request interceptor to add auth token to requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -23,16 +18,16 @@ api.interceptors.request.use(
   }
 );
 
-// Add a response interceptor to handle common errors
+// Response interceptor for handling common errors
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    // Handle 401 Unauthorized errors by logging out the user
+    // Handle 401 Unauthorized errors (token expired)
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/auth?redirect=" + window.location.pathname;
+      // Optionally redirect to login page or dispatch logout
     }
     return Promise.reject(error);
   }

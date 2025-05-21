@@ -11,9 +11,12 @@ import {
   FiMapPin,
   FiPackage,
   FiHeart,
+  FiLogOut,
 } from "react-icons/fi";
 import logoImg from "../assets/logo.png";
 import { useSearch } from "../context/SearchContext";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store/slices/authSlice";
 
 // Categories data for the dropdown
 const categories = [
@@ -39,9 +42,16 @@ const Navbar = () => {
   // Use search context instead of local state
   const { searchQuery, setSearchQuery, performSearch } = useSearch();
 
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
   const handleSearch = (e) => {
     e.preventDefault();
     performSearch(searchQuery);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
   };
 
   return (
@@ -106,62 +116,90 @@ const Navbar = () => {
               </motion.div>
 
               {/* User/Account section with dropdown */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="hidden md:flex items-center cursor-pointer relative"
-                onMouseEnter={() => setIsUserMenuOpen(true)}
-                onMouseLeave={() => setIsUserMenuOpen(false)}
-              >
-                <FiUser size={20} />
-                <span className="ml-1 text-sm font-medium">Account</span>
-                <FiChevronDown size={14} className="ml-1" />
+              {isAuthenticated ? (
+                <motion.div
+                  className="hidden md:flex items-center cursor-pointer relative"
+                  onMouseEnter={() => setIsUserMenuOpen(true)}
+                  onMouseLeave={() => setIsUserMenuOpen(false)}
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary">
+                    <img
+                      src={user?.image || "https://via.placeholder.com/150"}
+                      alt={user?.name || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="ml-2 text-sm font-medium">
+                    {user?.name?.split(" ")[0] || "Account"}
+                  </span>
+                  <FiChevronDown size={14} className="ml-1" />
 
-                {/* User dropdown menu */}
-                <AnimatePresence>
-                  {isUserMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full right-0 mt-1 w-48 bg-white shadow-lg rounded-md z-50"
-                    >
-                      <div className="py-1">
-                        <Link
-                          to="/auth"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Login / Register
-                        </Link>
-                        <Link
-                          to="/my-orders"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <span className="flex items-center">
-                            <FiPackage className="mr-2" />
-                            My Orders
-                          </span>
-                        </Link>
-                        <Link
-                          to="/profile"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          My Profile
-                        </Link>
-                        <Link
-                          to="/wishlist"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Wishlist
-                        </Link>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                  {/* User dropdown menu */}
+                  <AnimatePresence>
+                    {isUserMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute top-full right-0 mt-1 w-48 bg-white shadow-lg rounded-md z-50"
+                      >
+                        <div className="py-1">
+                          <Link
+                            to="/profile"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <span className="flex items-center">
+                              <FiUser className="mr-2" />
+                              My Profile
+                            </span>
+                          </Link>
+                          <Link
+                            to="/my-orders"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <span className="flex items-center">
+                              <FiPackage className="mr-2" />
+                              My Orders
+                            </span>
+                          </Link>
+                          <Link
+                            to="/wishlist"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <span className="flex items-center">
+                              <FiHeart className="mr-2" />
+                              Wishlist
+                            </span>
+                          </Link>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            onClick={() => {
+                              setIsUserMenuOpen(false);
+                              handleLogout();
+                            }}
+                          >
+                            <span className="flex items-center">
+                              <FiLogOut className="mr-2" />
+                              Sign Out
+                            </span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="hidden md:flex items-center cursor-pointer"
+                >
+                  <FiUser size={20} />
+                  <span className="ml-1 text-sm font-medium">Sign In</span>
+                </Link>
+              )}
 
               {/* Mobile login link */}
               <Link
@@ -337,16 +375,16 @@ const Navbar = () => {
                 <FiPackage className="mr-2" />
                 My Orders
               </Link>
-              <Link 
-                to="/profile" 
+              <Link
+                to="/profile"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 <FiUser className="mr-2" />
                 My Profile
               </Link>
-              <Link 
-                to="/wishlist" 
+              <Link
+                to="/wishlist"
                 className="p-2 border rounded-md flex items-center justify-center text-center hover:bg-gray-50 hover:border-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
@@ -360,7 +398,9 @@ const Navbar = () => {
                 </div>
                 <div className="flex items-center">
                   <FiMapPin size={16} className="text-primary" />
-                  <Link to="/store-locator" className="ml-1 text-sm">Find a Store</Link>
+                  <Link to="/store-locator" className="ml-1 text-sm">
+                    Find a Store
+                  </Link>
                 </div>
               </div>
             </div>
