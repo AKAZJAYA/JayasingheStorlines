@@ -1,37 +1,70 @@
-import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiUser, FiLock, FiAlertCircle } from 'react-icons/fi';
-// import { useAuth } from '../context/AuthContext';
-import logoImg from '../assets/logo.png';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiUser, FiLock, FiAlertCircle } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogin, clearError } from "../store/slices/adminAuthSlice";
+import logoImg from "../assets/logo.png";
 
 const Login = () => {
-  const [email, setEmail] = useState('admin@jayasinghe.lk');
-  const [password, setPassword] = useState('admin123');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  // const { login, authenticated } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { loading, error, isAuthenticated } = useSelector(
+    (state) => state.adminAuth
+  );
+
   // Redirect if already authenticated
-  // if (authenticated) {
-  //   return <Navigate to="/" />;
-  // }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear error when component unmounts or form values change
+  useEffect(() => {
+    return () => {
+      if (error) {
+        dispatch(clearError());
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [email, password, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+
+    if (!email || !password) {
+      return;
+    }
+
+    console.log("Login attempt:", { email, password }); // Debug log
 
     try {
-      await login(email, password);
-      navigate('/');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      const result = await dispatch(adminLogin({ email, password }));
+      console.log("Login result:", result); // Debug log
+
+      if (result.type === "adminAuth/login/fulfilled") {
+        console.log("Login successful, redirecting..."); // Debug log
+      } else {
+        console.log("Login failed:", result.payload); // Debug log
+      }
+    } catch (error) {
+      console.error("Login error:", error); // Debug log
     }
   };
+
+  // If already authenticated, redirect
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -43,16 +76,21 @@ const Login = () => {
       >
         <div className="py-10 px-8">
           <div className="text-center mb-10">
-            <img src={logoImg} alt="Jayasinghe Admin" className="h-16 mx-auto mb-4" />
+            <img
+              src={logoImg}
+              alt="Jayasinghe Admin"
+              className="h-16 mx-auto mb-4"
+            />
             <h2 className="text-3xl font-bold text-gray-800">Admin Login</h2>
             <p className="text-gray-600 mt-2">Sign in to your admin account</p>
           </div>
 
           {error && (
-            <motion.div 
+            <motion.div
               className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg flex items-center"
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
             >
               <FiAlertCircle className="mr-2 flex-shrink-0" />
               <span>{error}</span>
@@ -61,7 +99,12 @@ const Login = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address</label>
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-medium mb-2"
+              >
+                Email Address
+              </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <FiUser />
@@ -74,14 +117,22 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
 
             <div className="mb-6">
               <div className="flex justify-between mb-2">
-                <label htmlFor="password" className="block text-gray-700 font-medium">Password</label>
-                <a href="#" className="text-sm text-primary hover:underline">Forgot Password?</a>
+                <label
+                  htmlFor="password"
+                  className="block text-gray-700 font-medium"
+                >
+                  Password
+                </label>
+                <a href="#" className="text-sm text-primary hover:underline">
+                  Forgot Password?
+                </a>
               </div>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -95,20 +146,32 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
 
             <motion.button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium flex items-center justify-center"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: loading ? 1 : 1.01 }}
+              whileTap={{ scale: loading ? 1 : 0.99 }}
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </motion.button>
           </form>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p>Admin access only. Contact IT support if you need assistance.</p>
+          </div>
         </div>
       </motion.div>
     </div>
