@@ -1,0 +1,872 @@
+{
+  "info": {
+    "name": "Jayasinghe Storelines - Admin API",
+    "description": "Complete API collection for admin panel endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Admin Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('adminToken', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Admin Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Admin Name\",\n    \"phone\": \"+94 711 234 567\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Admin Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currentPassword\": \"admin123\",\n    \"newPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=10&search=&status=&role=&sort=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "role",
+                  "value": ""
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Single User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "USER_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"+94 712 345 678\",\n    \"role\": \"user\",\n    \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated John Doe\",\n    \"phone\": \"+94 712 345 999\",\n    \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "USER_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "USER_ID_HERE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Management",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?page=1&limit=10&search=&category=&status=&featured=&sort=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "category",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "featured",
+                  "value": ""
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Create New Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sample Product\",\n    \"sku\": \"SKU-001\",\n    \"description\": \"This is a sample product description\",\n    \"price\": 25000,\n    \"discountPrice\": 20000,\n    \"category\": \"CATEGORY_ID_HERE\",\n    \"stock\": 100,\n    \"imageUrl\": \"https://example.com/image.jpg\",\n    \"images\": [\"https://example.com/image1.jpg\", \"https://example.com/image2.jpg\"],\n    \"status\": \"active\",\n    \"isFeatured\": true,\n    \"isNewArrival\": false,\n    \"isOnSale\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Product Name\",\n    \"price\": 30000,\n    \"stock\": 150,\n    \"isFeatured\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "PRODUCT_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Bulk Update Products",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"productIds\": [\"PRODUCT_ID_1\", \"PRODUCT_ID_2\", \"PRODUCT_ID_3\"],\n    \"updateData\": {\n        \"status\": \"inactive\",\n        \"isFeatured\": false\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/bulk-update",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "bulk-update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", ":productId"],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "PRODUCT_ID_HERE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order Management",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders?page=1&limit=10&search=&status=&paymentStatus=&dateFrom=&dateTo=&sort=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "paymentStatus",
+                  "value": ""
+                },
+                {
+                  "key": "dateFrom",
+                  "value": ""
+                },
+                {
+                  "key": "dateTo",
+                  "value": ""
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "ORDER_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"shipped\",\n    \"trackingNumber\": \"TRK123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders/:orderId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders", ":orderId", "status"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "ORDER_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Updated order notes\",\n    \"shippingInfo\": {\n        \"address\": \"Updated shipping address\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "ORDER_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/orders/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "orders", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "ORDER_ID_HERE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales Management",
+      "item": [
+        {
+          "name": "Get Sales Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sales/overview?period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sales", "overview"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month",
+                  "description": "day, week, month, year"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sales by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sales/by-category?period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sales", "by-category"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month",
+                  "description": "week, month, year"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Top Selling Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sales/top-products?limit=10&period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sales", "top-products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "period",
+                  "value": "month",
+                  "description": "week, month, year"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sales Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sales/trends?period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sales", "trends"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month",
+                  "description": "week, month, year"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delivery Management",
+      "item": [
+        {
+          "name": "Get All Deliveries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries?page=1&limit=10&search=&status=&driverId=&dateFrom=&dateTo=&sort=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "driverId",
+                  "value": ""
+                },
+                {
+                  "key": "dateFrom",
+                  "value": ""
+                },
+                {
+                  "key": "dateTo",
+                  "value": ""
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Delivery Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get Drivers List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries/drivers",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries", "drivers"]
+            }
+          }
+        },
+        {
+          "name": "Create New Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORDER_ID_HERE\",\n    \"driver\": {\n        \"id\": \"DRV-001\",\n        \"name\": \"John Driver\",\n        \"phone\": \"+94 712 345 678\",\n        \"vehicle\": \"ABC-1234 (Van)\",\n        \"licenseNumber\": \"LIC123456\"\n    },\n    \"customer\": {\n        \"name\": \"Customer Name\",\n        \"email\": \"customer@example.com\",\n        \"phone\": \"+94 712 345 678\",\n        \"address\": \"123 Main St, Colombo\"\n    },\n    \"scheduledDate\": \"2024-04-20\",\n    \"scheduledTime\": \"10:00 - 12:00\",\n    \"deliveryInstructions\": \"Call before arrival\",\n    \"notes\": \"Fragile items\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries"]
+            }
+          }
+        },
+        {
+          "name": "Update Delivery",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"scheduledDate\": \"2024-04-21\",\n    \"scheduledTime\": \"14:00 - 16:00\",\n    \"notes\": \"Updated delivery notes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries/:deliveryId",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries", ":deliveryId"],
+              "variable": [
+                {
+                  "key": "deliveryId",
+                  "value": "DELIVERY_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Delivery Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"in_transit\",\n    \"notes\": \"Package picked up from warehouse\",\n    \"location\": \"Warehouse - Colombo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries/:deliveryId/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries", ":deliveryId", "status"],
+              "variable": [
+                {
+                  "key": "deliveryId",
+                  "value": "DELIVERY_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Assign Driver to Delivery",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"driver\": {\n        \"id\": \"DRV-002\",\n        \"name\": \"New Driver\",\n        \"phone\": \"+94 712 999 888\",\n        \"vehicle\": \"XYZ-9876 (Truck)\",\n        \"licenseNumber\": \"LIC789012\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/deliveries/:deliveryId/assign-driver",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "deliveries", ":deliveryId", "assign-driver"],
+              "variable": [
+                {
+                  "key": "deliveryId",
+                  "value": "DELIVERY_ID_HERE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

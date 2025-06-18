@@ -1,5 +1,5 @@
 import Product from '../models/Product.js';
-import Category from '../models/Category.js';
+// import Category from '../models/Category.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 // @desc    Get all products

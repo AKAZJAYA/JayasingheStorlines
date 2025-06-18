@@ -10,13 +10,13 @@ const Login = () => {
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, authenticated } = useAuth();
+  // const { login, authenticated } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
-  if (authenticated) {
-    return <Navigate to="/" />;
-  }
+  // if (authenticated) {
+  //   return <Navigate to="/" />;
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
