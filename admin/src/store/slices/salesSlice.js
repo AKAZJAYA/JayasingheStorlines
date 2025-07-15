@@ -8,7 +8,9 @@ export const fetchSalesOverview = createAsyncThunk(
   "sales/fetchSalesOverview",
   async (period, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/overview`, { params: { period } });
+      const response = await axios.get(`${API_URL}/overview`, {
+        params: { period },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -104,16 +106,19 @@ const salesSlice = createSlice({
       })
       .addCase(fetchSalesOverview.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch sales overview";
+        state.error =
+          action.payload?.message || "Failed to fetch sales overview";
       })
       .addCase(fetchSalesByCategory.fulfilled, (state, action) => {
-        state.salesByCategory = action.payload;
+        state.salesByCategory = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
       .addCase(fetchTopSellingProducts.fulfilled, (state, action) => {
-        state.topProducts = action.payload;
+        state.topProducts = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchSalesTrends.fulfilled, (state, action) => {
-        state.salesTrends = action.payload;
+        state.salesTrends = Array.isArray(action.payload) ? action.payload : [];
       });
   },
 });
