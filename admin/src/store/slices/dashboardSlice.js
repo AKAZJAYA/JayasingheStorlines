@@ -21,7 +21,9 @@ export const fetchDashboardStats = createAsyncThunk(
         sales: salesRes.data,
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Failed to fetch dashboard data" });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch dashboard data" }
+      );
     }
   }
 );
@@ -113,13 +115,32 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch dashboard stats";
+        state.error =
+          action.payload?.message || "Failed to fetch dashboard stats";
       })
       .addCase(fetchRecentOrders.fulfilled, (state, action) => {
-        state.recentOrders = action.payload;
+        state.recentOrders = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
       .addCase(fetchTopProducts.fulfilled, (state, action) => {
-        state.topProducts = action.payload;
+        // Handle different response formats from backend
+        if (Array.isArray(action.payload)) {
+          state.topProducts = action.payload;
+        } else if (action.payload && Array.isArray(action.payload.products)) {
+          state.topProducts = action.payload.products;
+        } else if (action.payload && Array.isArray(action.payload.data)) {
+          state.topProducts = action.payload.data;
+        } else {
+          state.topProducts = [];
+        }
+      })
+      .addCase(fetchRecentOrders.rejected, (state, action) => {
+        state.error =
+          action.payload?.message || "Failed to fetch recent orders";
+      })
+      .addCase(fetchTopProducts.rejected, (state, action) => {
+        state.error = action.payload?.message || "Failed to fetch top products";
       });
   },
 });

@@ -1,17 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../utils/api"; // Use the configured API instance instead of axios directly
 
-const API_URL = "/api/admin/users";
+const API_URL = "/admin/users"; // Remove /api prefix as it should be handled by the API configuration
 
 // Async thunks
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL, { params });
+      const response = await api.get(API_URL, { params });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to fetch users' });
     }
   }
 );
@@ -20,10 +20,10 @@ export const fetchUserStats = createAsyncThunk(
   "users/fetchUserStats",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/stats`);
+      const response = await api.get(`${API_URL}/stats`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to fetch user stats' });
     }
   }
 );
@@ -32,10 +32,10 @@ export const fetchUser = createAsyncThunk(
   "users/fetchUser",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/${userId}`);
+      const response = await api.get(`${API_URL}/${userId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to fetch user' });
     }
   }
 );
@@ -44,10 +44,10 @@ export const createUser = createAsyncThunk(
   "users/createUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL, userData);
-      return response.data;
+      const response = await api.post(API_URL, userData);
+      return response.data.user; // Return the user object from the response
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to create user' });
     }
   }
 );
@@ -56,10 +56,10 @@ export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ userId, userData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/${userId}`, userData);
-      return response.data;
+      const response = await api.put(`${API_URL}/${userId}`, userData);
+      return response.data.user; // Return the user object from the response
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to update user' });
     }
   }
 );
@@ -68,10 +68,10 @@ export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (userId, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}/${userId}`);
+      await api.delete(`${API_URL}/${userId}`);
       return userId;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Failed to delete user' });
     }
   }
 );

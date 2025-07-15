@@ -1,147 +1,123 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FiUser, FiUserPlus, FiEdit, FiTrash2, FiX, FiSearch, 
-  FiFilter, FiCheck, FiMail, FiPhone, FiMapPin, FiCalendar
-} from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FiUser,
+  FiUserPlus,
+  FiEdit,
+  FiTrash2,
+  FiX,
+  FiSearch,
+  FiFilter,
+  FiCheck,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiCalendar,
+} from "react-icons/fi";
+import {
+  fetchUsers,
+  fetchUserStats,
+  createUser,
+  updateUser,
+  deleteUser,
+  setFilters,
+  setPage,
+  clearError,
+  clearCurrentUser,
+} from "../store/slices/userSlice";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = useDispatch();
+
+  // Redux state
+  const {
+    users = [],
+    stats = {},
+    loading = false,
+    error = null,
+    pagination = { page: 1, limit: 10, total: 0, totalPages: 0 },
+    filters = { search: "", role: "all", status: "all" },
+  } = useSelector((state) => state.users);
+
+  // Local state
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [userForm, setUserForm] = useState({
-    id: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    status: 'active',
-    role: 'user'
+    name: "",
+    email: "",
+    phone: "",
+    role: "user",
+    isActive: true,
   });
   const [isNew, setIsNew] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [roleFilter, setRoleFilter] = useState('all');
 
-  // Simulate fetching users from API
+  // Local filter states for immediate UI updates
+  const [searchQuery, setSearchQuery] = useState(filters.search || "");
+  const [statusFilter, setStatusFilter] = useState(filters.status || "all");
+  const [roleFilter, setRoleFilter] = useState(filters.role || "all");
+
+  // Fetch data on component mount
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        // This would be an API call in a real application
-        setTimeout(() => {
-          setUsers([
-            { 
-              id: 1, 
-              name: 'John Doe', 
-              email: 'john@example.com', 
-              phone: '+94 712 345 678',
-              address: '123 Main St, Colombo',
-              status: 'active',
-              role: 'admin',
-              lastLogin: '2023-04-15',
-              registeredOn: '2022-11-20',
-              orders: 12
-            },
-            { 
-              id: 2, 
-              name: 'Jane Smith', 
-              email: 'jane@example.com', 
-              phone: '+94 723 456 789',
-              address: '456 Oak St, Kandy',
-              status: 'active',
-              role: 'user',
-              lastLogin: '2023-04-12',
-              registeredOn: '2023-01-05',
-              orders: 5
-            },
-            { 
-              id: 3, 
-              name: 'Kumar Perera', 
-              email: 'kumar@example.com', 
-              phone: '+94 765 432 109',
-              address: '789 Palm St, Galle',
-              status: 'inactive',
-              role: 'user',
-              lastLogin: '2023-03-25',
-              registeredOn: '2022-12-10',
-              orders: 3
-            },
-            { 
-              id: 4, 
-              name: 'Nimal Fernando', 
-              email: 'nimal@example.com', 
-              phone: '+94 778 901 234',
-              address: '101 Beach Rd, Negombo',
-              status: 'active',
-              role: 'user',
-              lastLogin: '2023-04-14',
-              registeredOn: '2023-02-15',
-              orders: 7
-            },
-            { 
-              id: 5, 
-              name: 'Amali Jayasinghe', 
-              email: 'amali@example.com', 
-              phone: '+94 736 789 012',
-              address: '202 Hill St, Nuwara Eliya',
-              status: 'suspended',
-              role: 'user',
-              lastLogin: '2023-02-20',
-              registeredOn: '2022-10-05',
-              orders: 2
-            },
-          ]);
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        setLoading(false);
-      }
+    dispatch(
+      fetchUsers({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: filters.search,
+        role: filters.role === "all" ? "" : filters.role,
+        status: filters.status === "all" ? "" : filters.status,
+      })
+    );
+    dispatch(fetchUserStats());
+  }, [dispatch, pagination.page, filters]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      dispatch(
+        setFilters({
+          search: searchQuery,
+          role: roleFilter,
+          status: statusFilter,
+        })
+      );
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, roleFilter, statusFilter, dispatch]);
+
+  // Clear error on unmount
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
     };
-
-    fetchUsers();
-  }, []);
-
-  // Filter users based on search query and filters
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    
-    return matchesSearch && matchesStatus && matchesRole;
-  });
-
-  // Pagination
-  const usersPerPage = 4;
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  }, [dispatch]);
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    dispatch(setPage(pageNumber));
   };
 
   const handleAddUser = () => {
     setUserForm({
-      id: '',
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      status: 'active',
-      role: 'user'
+      name: "",
+      email: "",
+      phone: "",
+      role: "user",
+      isActive: true,
     });
     setIsNew(true);
     setShowModal(true);
   };
 
   const handleEditUser = (user) => {
-    setUserForm({ ...user });
+    setUserForm({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone || "",
+      role: user.role,
+      isActive: user.isActive,
+    });
     setIsNew(false);
     setShowModal(true);
   };
@@ -150,66 +126,109 @@ const UserManagement = () => {
     setSelectedUser(user);
   };
 
-  const handleDeleteUser = (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      // In a real app, you would call an API to delete the user
-      setUsers(users.filter(user => user.id !== userId));
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        await dispatch(deleteUser(userId)).unwrap();
+        // Optionally show success message
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        // Handle error (show toast, etc.)
+      }
     }
   };
 
   const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setUserForm(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setUserForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
-    // In a real app, you would call an API to save the user
-    if (isNew) {
-      // Add new user
-      const newUser = {
-        ...userForm,
-        id: Math.max(...users.map(u => u.id)) + 1,
-        registeredOn: new Date().toISOString().split('T')[0],
-        lastLogin: '-',
-        orders: 0
-      };
-      setUsers([...users, newUser]);
-    } else {
-      // Update existing user
-      setUsers(users.map(user => user.id === userForm.id ? userForm : user));
+
+    try {
+      if (isNew) {
+        await dispatch(createUser(userForm)).unwrap();
+      } else {
+        await dispatch(
+          updateUser({
+            userId: userForm.id,
+            userData: userForm,
+          })
+        ).unwrap();
+      }
+      setShowModal(false);
+      // Optionally show success message
+    } catch (error) {
+      console.error("Error saving user:", error);
+      // Handle error (show toast, etc.)
     }
-    
-    setShowModal(false);
   };
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'active':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Active</span>;
-      case 'inactive':
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">Inactive</span>;
-      case 'suspended':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Suspended</span>;
-      default:
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{status}</span>;
+  const getStatusBadge = (user) => {
+    const isActive = user.isActive;
+    if (isActive) {
+      return (
+        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+          Active
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+          Inactive
+        </span>
+      );
     }
   };
 
   const getRoleBadge = (role) => {
-    switch(role) {
-      case 'admin':
-        return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">Admin</span>;
-      case 'user':
-        return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">User</span>;
+    switch (role) {
+      case "admin":
+        return (
+          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
+            Admin
+          </span>
+        );
+      case "user":
+        return (
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+            User
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">{role}</span>;
+        return (
+          <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+            {role}
+          </span>
+        );
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getUsersPerPage = 10;
+  const indexOfFirstUser = (pagination.page - 1) * getUsersPerPage;
+  const indexOfLastUser = Math.min(
+    indexOfFirstUser + getUsersPerPage,
+    pagination.total
+  );
+
   return (
     <div className="space-y-6">
+      {/* Error handling */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
+
       {/* Header section with stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <motion.div
@@ -224,11 +243,11 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Total Users</h3>
-              <p className="text-2xl font-semibold">{users.length}</p>
+              <p className="text-2xl font-semibold">{stats.totalUsers || 0}</p>
             </div>
           </div>
         </motion.div>
-        
+
         <motion.div
           className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
           initial={{ opacity: 0, y: 20 }}
@@ -241,11 +260,11 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Active Users</h3>
-              <p className="text-2xl font-semibold">{users.filter(user => user.status === 'active').length}</p>
+              <p className="text-2xl font-semibold">{stats.activeUsers || 0}</p>
             </div>
           </div>
         </motion.div>
-        
+
         <motion.div
           className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
           initial={{ opacity: 0, y: 20 }}
@@ -258,11 +277,11 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Admins</h3>
-              <p className="text-2xl font-semibold">{users.filter(user => user.role === 'admin').length}</p>
+              <p className="text-2xl font-semibold">{stats.adminUsers || 0}</p>
             </div>
           </div>
         </motion.div>
-        
+
         <motion.div
           className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
           initial={{ opacity: 0, y: 20 }}
@@ -270,19 +289,19 @@ const UserManagement = () => {
           transition={{ delay: 0.4 }}
         >
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-full text-red-600">
-              <FiX size={24} />
+            <div className="p-3 bg-orange-100 rounded-full text-orange-600">
+              <FiUser size={24} />
             </div>
             <div className="ml-4">
-              <h3 className="text-gray-500 text-sm">Suspended Users</h3>
-              <p className="text-2xl font-semibold">{users.filter(user => user.status === 'suspended').length}</p>
+              <h3 className="text-gray-500 text-sm">New Users</h3>
+              <p className="text-2xl font-semibold">{stats.newUsers || 0}</p>
             </div>
           </div>
         </motion.div>
       </div>
 
       {/* Search and filters section */}
-      <motion.div 
+      <motion.div
         className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -299,11 +318,11 @@ const UserManagement = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center">
               <label className="mr-2 text-sm text-gray-600">Status:</label>
-              <select 
+              <select
                 className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -311,13 +330,12 @@ const UserManagement = () => {
                 <option value="all">All</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <label className="mr-2 text-sm text-gray-600">Role:</label>
-              <select 
+              <select
                 className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
@@ -327,7 +345,7 @@ const UserManagement = () => {
                 <option value="user">User</option>
               </select>
             </div>
-            
+
             <motion.button
               className="ml-auto bg-primary text-white rounded-lg px-4 py-2 flex items-center"
               whileHover={{ scale: 1.02 }}
@@ -342,7 +360,7 @@ const UserManagement = () => {
       </motion.div>
 
       {/* User table section */}
-      <motion.div 
+      <motion.div
         className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -353,11 +371,13 @@ const UserManagement = () => {
             <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-gray-600">Loading users...</p>
           </div>
-        ) : currentUsers.length === 0 ? (
+        ) : users.length === 0 ? (
           <div className="p-8 text-center">
             <FiUser size={48} className="mx-auto mb-4 text-gray-400" />
             <p className="text-gray-600 mb-2">No users found</p>
-            <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+            <p className="text-gray-500 text-sm">
+              Try adjusting your search or filters
+            </p>
           </div>
         ) : (
           <>
@@ -365,60 +385,90 @@ const UserManagement = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Joined
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {currentUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                  {users.map((user) => (
+                    <tr
+                      key={user._id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0 mr-3">
                             <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center">
-                              {user.name.split(' ').map(n => n[0]).join('')}
+                              {user.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .substring(0, 2)}
                             </div>
                           </div>
                           <div className="ml-1">
-                            <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                            <div className="text-sm text-gray-500">Registered: {user.registeredOn}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {user.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{user.email}</div>
-                        <div className="text-sm text-gray-500">{user.phone}</div>
+                        <div className="text-sm text-gray-900">
+                          {user.email}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {user.phone || "N/A"}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(user.status)}
+                        {getStatusBadge(user)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getRoleBadge(user.role)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.orders}
+                        {formatDate(user.joinDate || user.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
                           <button
                             className="text-gray-600 hover:text-primary"
                             onClick={() => handleViewUser(user)}
+                            title="View Details"
                           >
                             <FiUser />
                           </button>
                           <button
                             className="text-gray-600 hover:text-blue-600"
                             onClick={() => handleEditUser(user)}
+                            title="Edit User"
                           >
                             <FiEdit />
                           </button>
                           <button
                             className="text-gray-600 hover:text-red-600"
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => handleDeleteUser(user._id)}
+                            title="Delete User"
                           >
                             <FiTrash2 />
                           </button>
@@ -429,33 +479,36 @@ const UserManagement = () => {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Pagination */}
             <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
               <div className="text-sm text-gray-700">
-                Showing <span className="font-medium">{indexOfFirstUser + 1}</span> to <span className="font-medium">
-                  {Math.min(indexOfLastUser, filteredUsers.length)}
-                </span> of <span className="font-medium">{filteredUsers.length}</span> users
+                Showing{" "}
+                <span className="font-medium">{indexOfFirstUser + 1}</span> to{" "}
+                <span className="font-medium">{indexOfLastUser}</span> of{" "}
+                <span className="font-medium">{pagination.total}</span> users
               </div>
               <div className="flex space-x-2">
                 <button
                   className={`px-3 py-1 rounded ${
-                    currentPage === 1 
-                      ? 'text-gray-400 cursor-not-allowed' 
-                      : 'text-gray-700 hover:bg-gray-50'
+                    pagination.page === 1
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-50"
                   }`}
-                  onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  onClick={() =>
+                    pagination.page > 1 && handlePageChange(pagination.page - 1)
+                  }
+                  disabled={pagination.page === 1}
                 >
                   Previous
                 </button>
-                {[...Array(totalPages)].map((_, i) => (
+                {[...Array(pagination.totalPages)].map((_, i) => (
                   <button
                     key={i}
                     className={`px-3 py-1 rounded ${
-                      currentPage === i + 1
-                        ? 'bg-primary text-white'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      pagination.page === i + 1
+                        ? "bg-primary text-white"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                     onClick={() => handlePageChange(i + 1)}
                   >
@@ -464,12 +517,15 @@ const UserManagement = () => {
                 ))}
                 <button
                   className={`px-3 py-1 rounded ${
-                    currentPage === totalPages
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-gray-700 hover:bg-gray-50'
+                    pagination.page === pagination.totalPages
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-50"
                   }`}
-                  onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    pagination.page < pagination.totalPages &&
+                    handlePageChange(pagination.page + 1)
+                  }
+                  disabled={pagination.page === pagination.totalPages}
                 >
                   Next
                 </button>
@@ -497,7 +553,9 @@ const UserManagement = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-800">User Details</h2>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  User Details
+                </h2>
                 <button
                   className="text-gray-500 hover:text-gray-700"
                   onClick={() => setSelectedUser(null)}
@@ -505,68 +563,69 @@ const UserManagement = () => {
                   <FiX size={20} />
                 </button>
               </div>
-              
+
               <div className="p-6">
                 <div className="flex items-center mb-6">
                   <div className="h-16 w-16 rounded-full bg-primary text-white flex items-center justify-center text-xl">
-                    {selectedUser.name.split(' ').map(n => n[0]).join('')}
+                    {selectedUser.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .substring(0, 2)}
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-xl font-semibold">{selectedUser.name}</h3>
+                    <h3 className="text-xl font-semibold">
+                      {selectedUser.name}
+                    </h3>
                     <div className="flex mt-1 space-x-2">
-                      {getStatusBadge(selectedUser.status)}
+                      {getStatusBadge(selectedUser)}
                       {getRoleBadge(selectedUser.role)}
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-sm text-gray-500 mb-1">Contact Information</h4>
+                      <h4 className="text-sm text-gray-500 mb-1">
+                        Contact Information
+                      </h4>
                       <div className="flex items-center">
                         <FiMail className="text-gray-400 mr-2" />
                         <span>{selectedUser.email}</span>
                       </div>
                       <div className="flex items-center mt-2">
                         <FiPhone className="text-gray-400 mr-2" />
-                        <span>{selectedUser.phone}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm text-gray-500 mb-1">Address</h4>
-                      <div className="flex items-start">
-                        <FiMapPin className="text-gray-400 mr-2 mt-1" />
-                        <span>{selectedUser.address}</span>
+                        <span>{selectedUser.phone || "N/A"}</span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-sm text-gray-500 mb-1">Account Information</h4>
+                      <h4 className="text-sm text-gray-500 mb-1">
+                        Account Information
+                      </h4>
                       <div className="flex items-center">
                         <FiCalendar className="text-gray-400 mr-2" />
-                        <span>Registered on: {selectedUser.registeredOn}</span>
+                        <span>
+                          Joined:{" "}
+                          {formatDate(
+                            selectedUser.joinDate || selectedUser.createdAt
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center mt-2">
-                        <FiCalendar className="text-gray-400 mr-2" />
-                        <span>Last login: {selectedUser.lastLogin}</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm text-gray-500 mb-1">Orders</h4>
-                      <div className="bg-gray-100 p-3 rounded-lg">
-                        <div className="text-2xl font-semibold">{selectedUser.orders}</div>
-                        <div className="text-xs text-gray-500">Total orders placed</div>
+                        <FiUser className="text-gray-400 mr-2" />
+                        <span>
+                          Loyalty Points: {selectedUser.loyaltyPoints || 0}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="border-t border-gray-200 p-6 flex justify-end space-x-4">
                 <button
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
@@ -608,7 +667,7 @@ const UserManagement = () => {
             >
               <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-800">
-                  {isNew ? 'Add New User' : 'Edit User'}
+                  {isNew ? "Add New User" : "Edit User"}
                 </h2>
                 <button
                   className="text-gray-500 hover:text-gray-700"
@@ -617,11 +676,16 @@ const UserManagement = () => {
                   <FiX size={20} />
                 </button>
               </div>
-              
+
               <form onSubmit={handleFormSubmit}>
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Full Name</label>
+                    <label
+                      htmlFor="name"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       id="name"
@@ -633,9 +697,14 @@ const UserManagement = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address</label>
+                    <label
+                      htmlFor="email"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
+                      Email Address *
+                    </label>
                     <input
                       type="email"
                       id="email"
@@ -647,9 +716,14 @@ const UserManagement = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">Phone Number</label>
+                    <label
+                      htmlFor="phone"
+                      className="block text-gray-700 font-medium mb-2"
+                    >
+                      Phone Number
+                    </label>
                     <input
                       type="text"
                       id="phone"
@@ -660,37 +734,35 @@ const UserManagement = () => {
                       onChange={handleFormChange}
                     />
                   </div>
-                  
+
+                  {isNew && (
+                    <div>
+                      <label
+                        htmlFor="password"
+                        className="block text-gray-700 font-medium mb-2"
+                      >
+                        Password *
+                      </label>
+                      <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                        placeholder="Enter password"
+                        value={userForm.password || ""}
+                        onChange={handleFormChange}
+                        required={isNew}
+                      />
+                    </div>
+                  )}
+
                   <div>
-                    <label htmlFor="address" className="block text-gray-700 font-medium mb-2">Address</label>
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                      placeholder="Enter address"
-                      value={userForm.address}
-                      onChange={handleFormChange}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="status" className="block text-gray-700 font-medium mb-2">Account Status</label>
-                    <select
-                      id="status"
-                      name="status"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                      value={userForm.status}
-                      onChange={handleFormChange}
+                    <label
+                      htmlFor="role"
+                      className="block text-gray-700 font-medium mb-2"
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="suspended">Suspended</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="role" className="block text-gray-700 font-medium mb-2">User Role</label>
+                      User Role
+                    </label>
                     <select
                       id="role"
                       name="role"
@@ -702,8 +774,23 @@ const UserManagement = () => {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="isActive"
+                        checked={userForm.isActive}
+                        onChange={handleFormChange}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-700 font-medium">
+                        Active Account
+                      </span>
+                    </label>
+                  </div>
                 </div>
-                
+
                 <div className="border-t border-gray-200 p-6 flex justify-end space-x-4">
                   <button
                     type="button"
@@ -715,8 +802,13 @@ const UserManagement = () => {
                   <button
                     type="submit"
                     className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700"
+                    disabled={loading}
                   >
-                    {isNew ? 'Add User' : 'Save Changes'}
+                    {loading
+                      ? "Saving..."
+                      : isNew
+                      ? "Add User"
+                      : "Save Changes"}
                   </button>
                 </div>
               </form>
