@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../utils/api";
 
 // Async thunks for dashboard data
 export const fetchDashboardStats = createAsyncThunk(
@@ -8,10 +8,10 @@ export const fetchDashboardStats = createAsyncThunk(
     try {
       // Fetch combined stats from multiple endpoints
       const [usersRes, productsRes, ordersRes, salesRes] = await Promise.all([
-        axios.get("/api/admin/users/stats"),
-        axios.get("/api/admin/products/stats"),
-        axios.get("/api/admin/orders/stats"),
-        axios.get("/api/admin/sales/overview"),
+        api.get("/admin/users/stats"),
+        api.get("/admin/products/stats"),
+        api.get("/admin/orders/stats"),
+        api.get("/admin/sales/overview"),
       ]);
 
       return {
@@ -32,7 +32,7 @@ export const fetchRecentOrders = createAsyncThunk(
   "dashboard/fetchRecentOrders",
   async (limit = 5, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/admin/orders", {
+      const response = await api.get("/admin/orders", {
         params: { limit, sort: "createdAt", order: "desc" },
       });
       return response.data.orders;
@@ -46,7 +46,7 @@ export const fetchTopProducts = createAsyncThunk(
   "dashboard/fetchTopProducts",
   async (limit = 5, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/admin/sales/top-products", {
+      const response = await api.get("/admin/sales/top-products", {
         params: { limit },
       });
       return response.data;
