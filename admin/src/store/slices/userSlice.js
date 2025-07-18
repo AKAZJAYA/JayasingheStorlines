@@ -11,7 +11,9 @@ export const fetchUsers = createAsyncThunk(
       const response = await api.get(API_URL, { params });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to fetch users' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch users" }
+      );
     }
   }
 );
@@ -21,9 +23,11 @@ export const fetchUserStats = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get(`${API_URL}/stats`);
-      return response.data;
+      return response.data.stats;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to fetch user stats' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch user stats" }
+      );
     }
   }
 );
@@ -35,7 +39,9 @@ export const fetchUser = createAsyncThunk(
       const response = await api.get(`${API_URL}/${userId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to fetch user' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch user" }
+      );
     }
   }
 );
@@ -47,7 +53,9 @@ export const createUser = createAsyncThunk(
       const response = await api.post(API_URL, userData);
       return response.data.user; // Return the user object from the response
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to create user' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to create user" }
+      );
     }
   }
 );
@@ -59,7 +67,9 @@ export const updateUser = createAsyncThunk(
       const response = await api.put(`${API_URL}/${userId}`, userData);
       return response.data.user; // Return the user object from the response
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to update user' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to update user" }
+      );
     }
   }
 );
@@ -71,7 +81,9 @@ export const deleteUser = createAsyncThunk(
       await api.delete(`${API_URL}/${userId}`);
       return userId;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to delete user' });
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to delete user" }
+      );
     }
   }
 );
@@ -139,8 +151,17 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || "Failed to fetch users";
       })
+      .addCase(fetchUserStats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchUserStats.fulfilled, (state, action) => {
         state.stats = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchUserStats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Failed to fetch user stats";
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.currentUser = action.payload;
@@ -149,7 +170,9 @@ const userSlice = createSlice({
         state.users.unshift(action.payload);
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        const index = state.users.findIndex(user => user._id === action.payload._id);
+        const index = state.users.findIndex(
+          (user) => user._id === action.payload._id
+        );
         if (index !== -1) {
           state.users[index] = action.payload;
         }
@@ -158,10 +181,11 @@ const userSlice = createSlice({
         }
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
-        state.users = state.users.filter(user => user._id !== action.payload);
+        state.users = state.users.filter((user) => user._id !== action.payload);
       });
   },
 });
 
-export const { setFilters, setPage, clearCurrentUser, clearError } = userSlice.actions;
+export const { setFilters, setPage, clearCurrentUser, clearError } =
+  userSlice.actions;
 export default userSlice.reducer;

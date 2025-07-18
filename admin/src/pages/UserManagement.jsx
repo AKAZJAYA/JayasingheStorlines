@@ -59,6 +59,7 @@ const UserManagement = () => {
 
   // Fetch data on component mount
   useEffect(() => {
+    console.log("Stats from Redux:", stats); // Debug log
     dispatch(
       fetchUsers({
         page: pagination.page,
@@ -68,7 +69,15 @@ const UserManagement = () => {
         status: filters.status === "all" ? "" : filters.status,
       })
     );
-    dispatch(fetchUserStats());
+
+    // Fetch user stats
+    dispatch(fetchUserStats())
+      .then((result) => {
+        console.log("Fetch user stats result:", result); // Debug log
+      })
+      .catch((error) => {
+        console.error("Error fetching user stats:", error); // Debug log
+      });
   }, [dispatch, pagination.page, filters]);
 
   // Debounced search effect
@@ -243,7 +252,15 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Total Users</h3>
-              <p className="text-2xl font-semibold">{stats.totalUsers || 0}</p>
+              <p className="text-2xl font-semibold">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
+                ) : (
+                  stats?.totalUsers?.toLocaleString() ||
+                  pagination?.total?.toLocaleString() ||
+                  "0"
+                )}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -260,7 +277,17 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Active Users</h3>
-              <p className="text-2xl font-semibold">{stats.activeUsers || 0}</p>
+              <p className="text-2xl font-semibold">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
+                ) : (
+                  stats?.activeUsers?.toLocaleString() ||
+                  users
+                    ?.filter((user) => user.isActive)
+                    ?.length?.toLocaleString() ||
+                  "0"
+                )}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -277,7 +304,17 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">Admins</h3>
-              <p className="text-2xl font-semibold">{stats.adminUsers || 0}</p>
+              <p className="text-2xl font-semibold">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
+                ) : (
+                  stats?.adminUsers?.toLocaleString() ||
+                  users
+                    ?.filter((user) => user.role === "admin")
+                    ?.length?.toLocaleString() ||
+                  "0"
+                )}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -294,7 +331,13 @@ const UserManagement = () => {
             </div>
             <div className="ml-4">
               <h3 className="text-gray-500 text-sm">New Users</h3>
-              <p className="text-2xl font-semibold">{stats.newUsers || 0}</p>
+              <p className="text-2xl font-semibold">
+                {loading ? (
+                  <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
+                ) : (
+                  stats?.newUsers?.toLocaleString() || "0"
+                )}
+              </p>
             </div>
           </div>
         </motion.div>
