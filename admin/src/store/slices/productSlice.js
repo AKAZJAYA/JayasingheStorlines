@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../utils/api";
 
-const API_URL = "/api/admin/products";
+const API_URL = "/admin/products";
 
 // Async thunks
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL, { params });
+      const response = await api.get(API_URL, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -20,7 +20,7 @@ export const fetchProductStats = createAsyncThunk(
   "products/fetchProductStats",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/stats`);
+      const response = await api.get(`${API_URL}/stats`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -32,7 +32,7 @@ export const createProduct = createAsyncThunk(
   "products/createProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL, productData);
+      const response = await api.post(API_URL, productData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -44,7 +44,7 @@ export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ productId, productData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/${productId}`, productData);
+      const response = await api.put(`${API_URL}/${productId}`, productData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -56,7 +56,7 @@ export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}/${productId}`);
+      await api.delete(`${API_URL}/${productId}`);
       return productId;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -68,7 +68,7 @@ export const bulkUpdateProducts = createAsyncThunk(
   "products/bulkUpdateProducts",
   async (updateData, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/bulk-update`, updateData);
+      const response = await api.put(`${API_URL}/bulk-update`, updateData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -144,18 +144,24 @@ const productSlice = createSlice({
         state.products.unshift(action.payload);
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
-        const index = state.products.findIndex(product => product._id === action.payload._id);
+        const index = state.products.findIndex(
+          (product) => product._id === action.payload._id
+        );
         if (index !== -1) {
           state.products[index] = action.payload;
         }
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.products = state.products.filter(product => product._id !== action.payload);
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload
+        );
       })
       .addCase(bulkUpdateProducts.fulfilled, (state, action) => {
         // Update products based on bulk update response
-        action.payload.forEach(updatedProduct => {
-          const index = state.products.findIndex(product => product._id === updatedProduct._id);
+        action.payload.forEach((updatedProduct) => {
+          const index = state.products.findIndex(
+            (product) => product._id === updatedProduct._id
+          );
           if (index !== -1) {
             state.products[index] = updatedProduct;
           }
