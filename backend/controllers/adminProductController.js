@@ -1,6 +1,6 @@
-import Product from '../models/Product.js';
-// import Category from '../models/Category.js';
-import asyncHandler from '../utils/asyncHandler.js';
+import Product from "../models/Product.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import { cloudinary } from "../config/cloudinary.js";
 
 // @desc    Get all products for admin
 // @route   GET /api/admin/products
@@ -13,8 +13,8 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     category,
     status,
     featured,
-    sort = 'createdAt',
-    order = 'desc'
+    sort = "createdAt",
+    order = "desc",
   } = req.query;
 
   // Build query object
@@ -23,27 +23,24 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   // Search by name or SKU
   if (search) {
     queryObj.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { sku: { $regex: search, $options: 'i' } }
+      { name: { $regex: search, $options: "i" } },
+      { sku: { $regex: search, $options: "i" } },
     ];
   }
 
   // Filter by category
-  if (category) {
-    const categoryObj = await Category.findOne({ slug: category });
-    if (categoryObj) {
-      queryObj.category = categoryObj._id;
-    }
+  if (category && category !== "all") {
+    queryObj.category = { $regex: new RegExp(`^${category}$`, "i") };
   }
 
   // Filter by status
-  if (status) {
+  if (status && status !== "all") {
     queryObj.status = status;
   }
 
   // Filter by featured
   if (featured) {
-    queryObj.isFeatured = featured === 'true';
+    queryObj.isFeatured = featured === "true";
   }
 
   // Calculate pagination
@@ -51,10 +48,9 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
   // Execute query with pagination and sort
   const sortOptions = {};
-  sortOptions[sort] = order === 'desc' ? -1 : 1;
+  sortOptions[sort] = order === "desc" ? -1 : 1;
 
   const products = await Product.find(queryObj)
-    .populate('category', 'name slug')
     .sort(sortOptions)
     .skip(skip)
     .limit(Number(limit));
@@ -68,8 +64,51 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     totalPages: Math.ceil(totalProducts / Number(limit)),
     currentPage: Number(page),
     total: totalProducts,
-    products
+    products,
   });
+});
+
+// @desc    Upload product images
+// @route   POST /api/admin/products/upload-images
+// @access  Private/Admin
+export const uploadProductImages = asyncHandler(async (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "No images uploaded",
+    });
+  }
+
+  const imageUrls = req.files.map((file) => ({
+    url: file.path,
+    public_id: file.filename,
+  }));
+
+  res.status(200).json({
+    success: true,
+    message: "Images uploaded successfully",
+    images: imageUrls,
+  });
+});
+
+// @desc    Delete image from Cloudinary
+// @route   DELETE /api/admin/products/delete-image/:publicId
+// @access  Private/Admin
+export const deleteProductImage = asyncHandler(async (req, res) => {
+  const { publicId } = req.params;
+
+  try {
+    await cloudinary.uploader.destroy(publicId);
+    res.status(200).json({
+      success: true,
+      message: "Image deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete image",
+    });
+  }
 });
 
 // @desc    Create new product
@@ -85,11 +124,11 @@ export const createProduct = asyncHandler(async (req, res) => {
     category,
     stock,
     imageUrl,
-    images,
-    status = 'active',
+    additionalImages = [],
+    status = "active",
     isFeatured = false,
     isNewArrival = false,
-    isOnSale = false
+    isOnSale = false,
   } = req.body;
 
   // Check if SKU already exists
@@ -97,7 +136,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   if (existingProduct) {
     return res.status(400).json({
       success: false,
-      message: 'Product with this SKU already exists'
+      message: "Product with this SKU already exists",
     });
   }
 
@@ -110,18 +149,16 @@ export const createProduct = asyncHandler(async (req, res) => {
     category,
     stock,
     imageUrl,
-    images,
+    additionalImages,
     status,
     isFeatured,
     isNewArrival,
-    isOnSale
+    isOnSale,
   });
-
-  await product.populate('category', 'name slug');
 
   res.status(201).json({
     success: true,
-    product
+    product,
   });
 });
 
@@ -134,7 +171,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (!product) {
     return res.status(404).json({
       success: false,
-      message: 'Product not found'
+      message: "Product not found",
     });
   }
 
@@ -144,23 +181,19 @@ export const updateProduct = asyncHandler(async (req, res) => {
     if (existingProduct) {
       return res.status(400).json({
         success: false,
-        message: 'Product with this SKU already exists'
+        message: "Product with this SKU already exists",
       });
     }
   }
 
-  product = await Product.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true
-    }
-  ).populate('category', 'name slug');
+  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({
     success: true,
-    product
+    product,
   });
 });
 
@@ -173,15 +206,37 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   if (!product) {
     return res.status(404).json({
       success: false,
-      message: 'Product not found'
+      message: "Product not found",
     });
+  }
+
+  // Delete images from Cloudinary
+  try {
+    if (product.imageUrl) {
+      const publicId = product.imageUrl.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(
+        `jayasinghe-storelines/products/${publicId}`
+      );
+    }
+
+    if (product.additionalImages && product.additionalImages.length > 0) {
+      const deletePromises = product.additionalImages.map((imageUrl) => {
+        const publicId = imageUrl.split("/").pop().split(".")[0];
+        return cloudinary.uploader.destroy(
+          `jayasinghe-storelines/products/${publicId}`
+        );
+      });
+      await Promise.all(deletePromises);
+    }
+  } catch (error) {
+    console.error("Error deleting images from Cloudinary:", error);
   }
 
   await Product.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
-    message: 'Product deleted successfully'
+    message: "Product deleted successfully",
   });
 });
 
@@ -190,37 +245,29 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 export const getProductStats = asyncHandler(async (req, res) => {
   const totalProducts = await Product.countDocuments();
-  const activeProducts = await Product.countDocuments({ status: 'active' });
-  const inactiveProducts = await Product.countDocuments({ status: 'inactive' });
+  const activeProducts = await Product.countDocuments({ status: "active" });
+  const inactiveProducts = await Product.countDocuments({ status: "inactive" });
   const outOfStock = await Product.countDocuments({ stock: 0 });
-  const lowStock = await Product.countDocuments({ stock: { $lte: 10, $gt: 0 } });
+  const lowStock = await Product.countDocuments({
+    stock: { $lte: 10, $gt: 0 },
+  });
   const featuredProducts = await Product.countDocuments({ isFeatured: true });
 
   // Get products by category
   const productsByCategory = await Product.aggregate([
     {
       $group: {
-        _id: '$category',
-        count: { $sum: 1 }
-      }
-    },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: '_id',
-        foreignField: '_id',
-        as: 'category'
-      }
-    },
-    {
-      $unwind: '$category'
+        _id: "$category",
+        count: { $sum: 1 },
+      },
     },
     {
       $project: {
-        name: '$category.name',
-        count: 1
-      }
-    }
+        category: "$_id",
+        count: 1,
+        _id: 0,
+      },
+    },
   ]);
 
   res.status(200).json({
@@ -232,8 +279,8 @@ export const getProductStats = asyncHandler(async (req, res) => {
       outOfStock,
       lowStock,
       featuredProducts,
-      productsByCategory
-    }
+      productsByCategory,
+    },
   });
 });
 
@@ -246,7 +293,7 @@ export const bulkUpdateProducts = asyncHandler(async (req, res) => {
   if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
     return res.status(400).json({
       success: false,
-      message: 'Please provide product IDs to update'
+      message: "Please provide product IDs to update",
     });
   }
 
@@ -258,6 +305,6 @@ export const bulkUpdateProducts = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: `${result.modifiedCount} products updated successfully`,
-    modifiedCount: result.modifiedCount
+    modifiedCount: result.modifiedCount,
   });
 });

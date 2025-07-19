@@ -28,6 +28,34 @@ export const fetchProductStats = createAsyncThunk(
   }
 );
 
+export const uploadProductImages = createAsyncThunk(
+  "products/uploadProductImages",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${API_URL}/upload-images`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const deleteProductImage = createAsyncThunk(
+  "products/deleteProductImage",
+  async (publicId, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`${API_URL}/delete-image/${publicId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const createProduct = createAsyncThunk(
   "products/createProduct",
   async (productData, { rejectWithValue }) => {
@@ -85,7 +113,9 @@ const initialState = {
     outOfStock: 0,
     lowStock: 0,
   },
+  uploadedImages: [],
   loading: false,
+  uploadingImages: false,
   error: null,
   pagination: {
     page: 1,
@@ -116,6 +146,9 @@ const productSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearUploadedImages: (state) => {
+      state.uploadedImages = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -138,17 +171,29 @@ const productSlice = createSlice({
         state.error = action.payload?.message || "Failed to fetch products";
       })
       .addCase(fetchProductStats.fulfilled, (state, action) => {
-        state.stats = action.payload;
+        state.stats = action.payload.stats;
+      })
+      .addCase(uploadProductImages.pending, (state) => {
+        state.uploadingImages = true;
+        state.error = null;
+      })
+      .addCase(uploadProductImages.fulfilled, (state, action) => {
+        state.uploadingImages = false;
+        state.uploadedImages = action.payload.images;
+      })
+      .addCase(uploadProductImages.rejected, (state, action) => {
+        state.uploadingImages = false;
+        state.error = action.payload?.message || "Failed to upload images";
       })
       .addCase(createProduct.fulfilled, (state, action) => {
-        state.products.unshift(action.payload);
+        state.products.unshift(action.payload.product);
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.products.findIndex(
-          (product) => product._id === action.payload._id
+          (product) => product._id === action.payload.product._id
         );
         if (index !== -1) {
-          state.products[index] = action.payload;
+          state.products[index] = action.payload.product;
         }
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
@@ -170,5 +215,6 @@ const productSlice = createSlice({
   },
 });
 
-export const { setFilters, setPage, clearError } = productSlice.actions;
+export const { setFilters, setPage, clearError, clearUploadedImages } =
+  productSlice.actions;
 export default productSlice.reducer;
