@@ -11,6 +11,7 @@ import { AnimatePresence } from "framer-motion";
 import { useSearch } from "../context/SearchContext";
 import SearchResults from "../components/SearchResults";
 import NewArrivals from "../components/NewArrivals";
+import OnSaleProducts from "../components/OnSaleProducts";
 
 const HomePage = () => {
   const { searchQuery } = useSearch();
@@ -34,7 +35,7 @@ const HomePage = () => {
       <PromoBanner />
 
       {/* Top Selling Products */}
-      <FeaturedProducts title="Latest Electronics" viewAll={true} />
+      <FeaturedProducts title="Featured Products" viewAll={true} />
 
       {/* Brand Showcase */}
       <BrandShowcase />
@@ -43,11 +44,10 @@ const HomePage = () => {
       <Testimonials />
 
       {/* Online Exclusive */}
-      <FeaturedProducts title="Special Offers" viewAll={true} />
+      <OnSaleProducts title="On-SALE" limit={8} viewAll />
 
       {/* Newsletter */}
       <Newsletter />
-      
     </>
   );
 };

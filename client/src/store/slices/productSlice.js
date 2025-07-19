@@ -75,6 +75,20 @@ export const fetchProductsByCategory = createAsyncThunk(
   }
 );
 
+export const fetchOnSaleProducts = createAsyncThunk(
+  "products/fetchOnSaleProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/on-sale`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch on-sale products" }
+      );
+    }
+  }
+);
+
 export const addProductReview = createAsyncThunk(
   "products/addProductReview",
   async ({ productId, reviewData }, { rejectWithValue }) => {
@@ -100,6 +114,7 @@ const initialState = {
     success: false,
   },
   newArrivals: [],
+  onSaleProducts: [],
   productsByCategory: {},
   currentProduct: null,
   loading: false,
@@ -225,6 +240,19 @@ const productSlice = createSlice({
         state.loading = false;
         state.error =
           action.payload?.message || "Failed to fetch products by category";
+      })
+      .addCase(fetchOnSaleProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOnSaleProducts.fulfilled, (state, action) => {
+        state.onSaleProducts = action.payload.products || action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchOnSaleProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || "Failed to fetch on-sale products";
       })
       .addCase(addProductReview.fulfilled, (state, action) => {
         if (state.currentProduct) {
