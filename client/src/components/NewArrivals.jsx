@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FiChevronRight, FiHeart, FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { fetchFeaturedProducts } from "../store/slices/productSlice";
+import { fetchNewArrivals } from "../store/slices/productSlice";
 import { addToCart } from "../store/slices/cartSlice";
 import { addToWishlist } from "../store/slices/wishlistSlice";
 
@@ -168,25 +168,25 @@ const ProductCard = ({ product, index }) => {
   );
 };
 
-const FeaturedProducts = ({
-  title = "Featured Products",
-  viewAll = false,
-  limit,
+const NewArrivals = ({
+  title = "New Arrivals",
+  limit = null,
+  viewAll = true,
 }) => {
   const dispatch = useDispatch();
-  const { featuredProducts, loading, error } = useSelector(
+  const { newArrivals, loading, error } = useSelector(
     (state) => state.products
   );
 
   useEffect(() => {
-    dispatch(fetchFeaturedProducts());
+    dispatch(fetchNewArrivals());
   }, [dispatch]);
 
+  // Apply limit if specified
+  const productsToShow = limit ? newArrivals.slice(0, limit) : newArrivals;
+
   // Handle loading state
-  if (
-    loading &&
-    (!featuredProducts.products || featuredProducts.products.length === 0)
-  ) {
+  if (loading && !newArrivals.length) {
     return (
       <div className="py-10">
         <div className="container mx-auto px-4">
@@ -207,7 +207,7 @@ const FeaturedProducts = ({
             <h2 className="text-2xl font-bold mb-4">{title}</h2>
             <p className="text-red-500 mb-4">{error}</p>
             <button
-              onClick={() => dispatch(fetchFeaturedProducts())}
+              onClick={() => dispatch(fetchNewArrivals())}
               className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark"
             >
               Try Again
@@ -218,11 +218,6 @@ const FeaturedProducts = ({
     );
   }
 
-  // Get products to display
-  const productsToShow = limit
-    ? featuredProducts.products?.slice(0, limit)
-    : featuredProducts.products || [];
-
   // Handle empty state
   if (!productsToShow || productsToShow.length === 0) {
     return (
@@ -231,7 +226,7 @@ const FeaturedProducts = ({
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">{title}</h2>
             <p className="text-gray-500">
-              No featured products available at the moment.
+              No new arrivals available at the moment.
             </p>
           </div>
         </div>
@@ -245,21 +240,25 @@ const FeaturedProducts = ({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">{title}</h2>
-          {viewAll && (
+          {viewAll && newArrivals.length > 0 && (
             <motion.button
               whileHover={{ x: 5 }}
               className="flex items-center text-primary font-medium hover:text-primary-dark"
             >
-              View All <FiChevronRight className="ml-1" />
+              <Link
+                to="/products?newArrival=true"
+                className="flex items-center"
+              >
+                View All <FiChevronRight className="ml-1" />
+              </Link>
             </motion.button>
           )}
         </div>
 
         {/* Products count */}
-        {featuredProducts.count > 0 && (
+        {newArrivals.length > 0 && (
           <p className="text-gray-600 mb-4">
-            Showing {productsToShow.length} of {featuredProducts.count} featured
-            products
+            Showing {productsToShow.length} of {newArrivals.length} new arrivals
           </p>
         )}
 
@@ -275,21 +274,19 @@ const FeaturedProducts = ({
         </div>
 
         {/* Show more button if limited */}
-        {limit &&
-          featuredProducts.products &&
-          featuredProducts.products.length > limit && (
-            <div className="text-center mt-8">
-              <Link
-                to="/products?featured=true"
-                className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
-              >
-                View All Featured Products ({featuredProducts.count})
-              </Link>
-            </div>
-          )}
+        {limit && newArrivals.length > limit && (
+          <div className="text-center mt-8">
+            <Link
+              to="/products?newArrival=true"
+              className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
+            >
+              View All New Arrivals ({newArrivals.length})
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default FeaturedProducts;
+export default NewArrivals;

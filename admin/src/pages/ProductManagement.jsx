@@ -60,18 +60,23 @@ const ProductManagement = () => {
   });
 
   // Categories derived from product data - fallback to common categories
-  const categories =
-    products.length > 0
-      ? [...new Set(products.map((product) => product.category))]
-      : [
-          "Electronics",
-          "Smartphones",
-          "Furniture",
-          "Gaming",
-          "Computers",
-          "Audio",
-          "Smart Home",
-        ];
+  const categories = [
+    "Electronics",
+    "Smartphones",
+    "Furniture",
+    "Gaming",
+    "Computers",
+    "Audio",
+    "Smart Home",
+    "Appliances",
+    "Fashion",
+    "Books",
+    "Sports",
+    "Health",
+    "Beauty",
+    "Toys",
+    "Automotive",
+  ];
 
   // Fetch products on component mount and when filters change
   useEffect(() => {
@@ -435,14 +440,14 @@ const ProductManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <tr
-                  key={product._id}
+                  key={product._id || `product-${index}`}
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      #{product._id.slice(-6)}
+                      #{product._id ? product._id.slice(-6) : "N/A"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -453,28 +458,28 @@ const ProductManagement = () => {
                             product.imageUrl ||
                             "https://placehold.co/100x100/333/FFF?text=No+Image"
                           }
-                          alt={product.name}
+                          alt={product.name || "Product"}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {product.name}
+                          {product.name || "Unnamed Product"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          SKU: {product.sku}
+                          SKU: {product.sku || "N/A"}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {product.category}
+                      {product.category || "N/A"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      Rs. {product.price?.toLocaleString()}
+                      Rs. {product.price ? product.price.toLocaleString() : "0"}
                       {product.discountPrice && (
                         <div className="text-xs text-green-600">
                           Discount: Rs. {product.discountPrice.toLocaleString()}
@@ -483,10 +488,12 @@ const ProductManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{product.stock}</div>
+                    <div className="text-sm text-gray-900">
+                      {product.stock || 0}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(product.status)}
+                    {getStatusBadge(product.status || "unknown")}
                     {product.isFeatured && (
                       <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                         Featured
@@ -507,14 +514,14 @@ const ProductManagement = () => {
                     <button
                       onClick={() => handleEdit(product)}
                       className="text-indigo-600 hover:text-indigo-900 mr-4"
-                      disabled={loading}
+                      disabled={loading || !product._id}
                     >
                       <FiEdit2 className="inline" /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product._id)}
                       className="text-red-600 hover:text-red-900"
-                      disabled={loading}
+                      disabled={loading || !product._id}
                     >
                       <FiTrash2 className="inline" /> Delete
                     </button>

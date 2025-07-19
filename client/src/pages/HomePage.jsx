@@ -10,16 +10,15 @@ import Newsletter from "../components/Newsletter";
 import { AnimatePresence } from "framer-motion";
 import { useSearch } from "../context/SearchContext";
 import SearchResults from "../components/SearchResults";
+import NewArrivals from "../components/NewArrivals";
 
 const HomePage = () => {
   const { searchQuery } = useSearch();
-  
+
   return (
     <>
-      <AnimatePresence>
-        {searchQuery && <SearchResults />}
-      </AnimatePresence>
-      
+      <AnimatePresence>{searchQuery && <SearchResults />}</AnimatePresence>
+
       <HeroBanner />
 
       {/* Service Highlights */}
@@ -28,14 +27,14 @@ const HomePage = () => {
       {/* Featured Categories */}
       <CategorySection />
 
-      {/* Featured Products */}
-      <FeaturedProducts title="Latest Electronics" viewAll={true} />
+      {/* New Arrivals */}
+      <NewArrivals title="New Arrivals" limit={8} viewAll />
 
       {/* Promo Banner */}
       <PromoBanner />
 
       {/* Top Selling Products */}
-      <FeaturedProducts title="Premium Furniture" viewAll={true} />
+      <FeaturedProducts title="Latest Electronics" viewAll={true} />
 
       {/* Brand Showcase */}
       <BrandShowcase />
@@ -48,6 +47,7 @@ const HomePage = () => {
 
       {/* Newsletter */}
       <Newsletter />
+      
     </>
   );
 };
