@@ -79,16 +79,25 @@ export const uploadProductImages = asyncHandler(async (req, res) => {
     });
   }
 
-  const imageUrls = req.files.map((file) => ({
-    url: file.path,
-    public_id: file.filename,
-  }));
+  try {
+    const imageUrls = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
 
-  res.status(200).json({
-    success: true,
-    message: "Images uploaded successfully",
-    images: imageUrls,
-  });
+    res.status(200).json({
+      success: true,
+      message: "Images uploaded successfully",
+      images: imageUrls,
+    });
+  } catch (error) {
+    console.error("Image upload error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error uploading images to Cloudinary",
+      error: process.env.NODE_ENV === "development" ? error.message : null,
+    });
+  }
 });
 
 // @desc    Delete image from Cloudinary

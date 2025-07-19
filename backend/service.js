@@ -97,13 +97,25 @@ app.get("/api/test", (req, res) => {
 
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
-  console.error("Error details:", {
-    message: err.message,
-    stack: err.stack,
-    url: req.url,
-    method: req.method,
-    timestamp: new Date().toISOString(),
-  });
+  console.error("Server error:", err.stack);
+
+  // Handle multer errors
+  if (err.name === "MulterError") {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+      error: process.env.NODE_ENV === "development" ? err.stack : null,
+    });
+  }
+
+  // Handle Cloudinary errors
+  if (err.message && err.message.includes("Cloudinary")) {
+    return res.status(500).json({
+      success: false,
+      message: "Image upload service error",
+      error: process.env.NODE_ENV === "development" ? err.message : null,
+    });
+  }
 
   // Handle MongoDB/Mongoose specific errors
   if (err.name === "MongooseError" || err.name === "MongoError") {
