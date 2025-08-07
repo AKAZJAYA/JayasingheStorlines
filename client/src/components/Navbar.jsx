@@ -43,6 +43,15 @@ const Navbar = () => {
   const { searchQuery, setSearchQuery, performSearch } = useSearch();
 
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  // Get cart items from Redux store
+  const { items } = useSelector((state) => state.cart);
+
+  // Calculate total quantity of items in cart
+  const cartItemsCount = items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   const dispatch = useDispatch();
 
   const handleSearch = (e) => {
@@ -213,7 +222,7 @@ const Navbar = () => {
                 <div className="relative">
                   <FiShoppingCart size={20} />
                   <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    2
+                    {cartItemsCount}
                   </span>
                 </div>
                 <span className="ml-1 text-sm font-medium hidden md:inline">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import {
@@ -31,19 +31,23 @@ import {
   clearCart,
   applyPromoCode,
   removePromoCode,
-  setShippingCost, // Changed from setShippingMethod to setShippingCost
+  setShippingCost,
 } from "../store/slices/cartSlice";
 
 const CartPage = () => {
-  // Redux
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     items = [],
     subtotal = 0,
+    total = 0,
     promoCode,
     promoDiscount = 0,
+    shippingCost = 0,
     loading,
-  } = useSelector((state) => state.cart || {});
+    error,
+  } = useSelector((state) => state.cart);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   // Local state for UI
   const [isCartEmpty, setIsCartEmpty] = useState(false);
@@ -54,7 +58,7 @@ const CartPage = () => {
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [promoCodeInput, setPromoCodeInput] = useState("");
 
-  // Billing information
+  // Form state
   const [billingInfo, setBillingInfo] = useState({
     firstName: "",
     lastName: "",
@@ -76,16 +80,7 @@ const CartPage = () => {
     phone: "",
   });
 
-  // Calculate shipping cost and total
-  const shippingCost =
-    shippingMethod === "express"
-      ? 2990
-      : shippingMethod === "standard"
-      ? 1590
-      : 0;
-  const discount = promoDiscount > 0 ? Math.round(subtotal * promoDiscount) : 0;
-  const total = subtotal + shippingCost - discount;
-
+  // Formatter for currency
   const formatter = new Intl.NumberFormat("en-US");
 
   // Fetch cart on component mount
@@ -100,21 +95,39 @@ const CartPage = () => {
 
   // Handle quantity changes
   const handleUpdateQuantity = (id, newQuantity) => {
-    dispatch(
-      updateCartItem({ productId: id, quantity: Math.max(1, newQuantity) })
-    );
+    if (newQuantity < 1) return;
+
+    dispatch(updateCartItem({ productId: id, quantity: newQuantity }))
+      .unwrap()
+      .catch((error) => {
+        console.error("Failed to update quantity", error);
+        // Show error notification
+      });
   };
 
   // Remove item from cart
   const handleRemoveFromCart = (id) => {
-    dispatch(removeCartItem(id));
+    dispatch(removeCartItem(id))
+      .unwrap()
+      .catch((error) => {
+        console.error("Failed to remove item", error);
+        // Show error notification
+      });
   };
 
   // Apply promo code
   const handleApplyPromoCode = () => {
-    if (promoCodeInput) {
-      dispatch(applyPromoCode(promoCodeInput));
-    }
+    if (!promoCodeInput) return;
+
+    dispatch(applyPromoCode(promoCodeInput))
+      .unwrap()
+      .then(() => {
+        // Show success notification
+      })
+      .catch((error) => {
+        console.error("Failed to apply promo code", error);
+        // Show error notification
+      });
   };
 
   // Handle shipping method change
@@ -126,61 +139,22 @@ const CartPage = () => {
     dispatch(setShippingCost(cost));
   };
 
-  // Handle billing form changes
-  const handleBillingChange = (e) => {
-    const { name, value } = e.target;
-    setBillingInfo({
-      ...billingInfo,
-      [name]: value,
-    });
-
-    if (sameAsShipping) {
-      setShippingInfo({
-        ...shippingInfo,
-        [name]: value,
-      });
+  // Handle proceed to checkout
+  const handleProceedToCheckout = () => {
+    if (!isAuthenticated) {
+      // Redirect to login with a return URL
+      navigate("/auth?redirect=checkout");
+      return;
     }
+
+    // Proceed to checkout page
+    navigate("/checkout");
   };
 
-  // Handle shipping form changes
-  const handleShippingChange = (e) => {
-    const { name, value } = e.target;
-    setShippingInfo({
-      ...shippingInfo,
-      [name]: value,
-    });
-  };
-
-  // Handle same as billing checkbox
-  const handleSameAsShipping = (e) => {
-    setSameAsShipping(e.target.checked);
-    if (e.target.checked) {
-      setShippingInfo({
-        firstName: billingInfo.firstName,
-        lastName: billingInfo.lastName,
-        address: billingInfo.address,
-        city: billingInfo.city,
-        province: billingInfo.province,
-        postalCode: billingInfo.postalCode,
-        phone: billingInfo.phone,
-      });
-    }
-  };
-
-  // Expand/collapse sections
-  const toggleBillingSection = () => {
-    setBillingExpanded(!billingExpanded);
-    // If opening billing, close payment
-    if (!billingExpanded) {
-      setPaymentExpanded(false);
-    }
-  };
-
-  const togglePaymentSection = () => {
-    setPaymentExpanded(!paymentExpanded);
-    // If opening payment, close billing
-    if (!paymentExpanded) {
-      setBillingExpanded(false);
+  // Handle clear cart
+  const handleClearCart = () => {
+    if (window.confirm("Are you sure you want to clear your cart?")) {
+      dispatch(clearCart());
     }
   };
 
@@ -210,26 +184,13 @@ const CartPage = () => {
               Continue Shopping <FiArrowRight className="ml-2" />
             </Link>
           </motion.div>
-
-          {/* Featured products suggestion */}
-          <div className="mt-20">
-            <h3 className="text-xl font-bold mb-6 text-center">
-              You might be interested in
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Suggested products would go here */}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-20">
-          <ServiceHighlights />
         </div>
       </div>
     );
   }
 
-  if (loading) {
+  // Loading state
+  if (loading && items.length === 0) {
     return (
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
@@ -253,9 +214,8 @@ const CartPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column - Cart, Billing, Payment */}
+          {/* Left Column - Cart Items */}
           <div className="lg:w-8/12">
-            {/* Cart Items Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -316,6 +276,7 @@ const CartPage = () => {
                               )
                             }
                             className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
+                            disabled={item.quantity <= 1}
                           >
                             <FiMinus size={16} />
                           </button>
@@ -352,16 +313,13 @@ const CartPage = () => {
                   <FiArrowRight className="mr-2 rotate-180" /> Continue Shopping
                 </Link>
                 <button
-                  onClick={() => dispatch(clearCart())}
+                  onClick={handleClearCart}
                   className="text-gray-600 hover:text-red-600 font-medium"
                 >
                   Clear Cart
                 </button>
               </div>
             </motion.div>
-
-            {/* Rest of your form sections (billing, payment) remain largely unchanged */}
-            {/* ... */}
           </div>
 
           {/* Order Summary Section */}
@@ -498,7 +456,9 @@ const CartPage = () => {
                   {promoDiscount > 0 && (
                     <div className="flex justify-between mb-2 text-green-600">
                       <span>Discount ({promoDiscount * 100}%)</span>
-                      <span>- Rs. {formatter.format(discount)}</span>
+                      <span>
+                        - Rs. {formatter.format(promoDiscount * subtotal)}
+                      </span>
                     </div>
                   )}
 
@@ -522,12 +482,12 @@ const CartPage = () => {
 
               {/* Checkout and Payment Options */}
               <div className="p-6 bg-gray-50">
-                <Link
-                  to="/checkout"
-                  className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium flex items-center justify-center mb-4"
+                <button
+                  onClick={handleProceedToCheckout}
+                  className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium flex items-center justify-center mb-4 hover:bg-primary-dark transition-colors"
                 >
-                  Place Order <FiArrowRight className="ml-2" />
-                </Link>
+                  Proceed to Checkout <FiArrowRight className="ml-2" />
+                </button>
 
                 <div className="flex flex-wrap justify-between items-center mb-4">
                   <div className="flex items-center text-gray-600 text-sm">
@@ -570,7 +530,9 @@ const CartPage = () => {
       </div>
 
       {/* Service highlights and newsletter */}
-      <ServiceHighlights />
+      <div className="mt-12">
+        <ServiceHighlights />
+      </div>
       <Newsletter />
     </div>
   );
