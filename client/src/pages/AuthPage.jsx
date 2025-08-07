@@ -20,6 +20,7 @@ import {
   clearError,
   clearMessage,
 } from "../store/slices/authSlice";
+import { toast } from "react-toastify";
 
 const AuthPage = () => {
   const dispatch = useDispatch();
@@ -70,16 +71,22 @@ const AuthPage = () => {
 
     if (activeTab === "login") {
       // Login logic
-      dispatch(
-        login({
-          email: formData.email,
-          password: formData.password,
+      dispatch(login({ email: formData.email, password: formData.password }))
+        .unwrap()
+        .then((user) => {
+          toast.success(`Welcome back, ${user.name}!`);
+          // Redirect happens via useEffect
         })
-      );
+        .catch((error) => {
+          toast.error(
+            error.message || "Login failed. Please check your credentials."
+          );
+        });
     } else {
-      // Register logic
+      // Registration logic
       if (formData.password !== formData.confirmPassword) {
-        // Handle password mismatch locally
+        dispatch(setError("Passwords do not match"));
+        toast.error("Passwords do not match");
         return;
       }
 
@@ -90,7 +97,17 @@ const AuthPage = () => {
           password: formData.password,
           phone: formData.phone,
         })
-      );
+      )
+        .unwrap()
+        .then((user) => {
+          toast.success(`Welcome to Jayasinghe Storelines, ${user.name}!`);
+          // Redirect happens via useEffect
+        })
+        .catch((error) => {
+          toast.error(
+            error.message || "Registration failed. Please try again."
+          );
+        });
     }
   };
 
