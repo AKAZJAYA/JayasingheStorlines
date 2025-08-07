@@ -138,6 +138,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     isFeatured = false,
     isNewArrival = false,
     isOnSale = false,
+    specifications = {},
   } = req.body;
 
   // Check if SKU already exists
@@ -163,6 +164,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     isFeatured,
     isNewArrival,
     isOnSale,
+    specifications,
   });
 
   res.status(201).json({

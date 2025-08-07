@@ -46,6 +46,9 @@ const ProductManagement = () => {
     key: filters.sortBy || "name",
     direction: filters.sortOrder === "desc" ? "descending" : "ascending",
   });
+  const [specifications, setSpecifications] = useState([
+    { key: "", value: "" },
+  ]);
 
   // Categories derived from product data - fallback to common categories
   const categories = [
@@ -117,6 +120,7 @@ const ProductManagement = () => {
     setIsNew(true);
     setShowModal(true);
     dispatch(clearUploadedImages());
+    setSpecifications([{ key: "", value: "" }]);
   };
 
   const handleEdit = (product) => {
@@ -127,6 +131,18 @@ const ProductManagement = () => {
     setIsNew(false);
     setShowModal(true);
     dispatch(clearUploadedImages());
+
+    // Convert Map-like object to array of key-value pairs for the form
+    if (product.specifications) {
+      const specsArray = Object.entries(product.specifications).map(
+        ([key, value]) => ({ key, value })
+      );
+      setSpecifications(
+        specsArray.length > 0 ? specsArray : [{ key: "", value: "" }]
+      );
+    } else {
+      setSpecifications([{ key: "", value: "" }]);
+    }
   };
 
   const handleDelete = async (productId) => {
@@ -158,10 +174,33 @@ const ProductManagement = () => {
     }));
   };
 
+  const handleSpecificationChange = (index, field, value) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[index][field] = value;
+    setSpecifications(updatedSpecs);
+  };
+
+  const addSpecificationField = () => {
+    setSpecifications([...specifications, { key: "", value: "" }]);
+  };
+
+  const removeSpecificationField = (index) => {
+    const updatedSpecs = specifications.filter((_, i) => i !== index);
+    setSpecifications(updatedSpecs);
+  };
+
   const handleSaveProduct = async (e) => {
     e.preventDefault();
 
     try {
+      // Convert specifications array to object
+      const specsObj = {};
+      specifications.forEach((spec) => {
+        if (spec.key.trim() && spec.value.trim()) {
+          specsObj[spec.key.trim()] = spec.value.trim();
+        }
+      });
+
       const productData = {
         name: currentProduct.name,
         sku: currentProduct.sku,
@@ -178,6 +217,7 @@ const ProductManagement = () => {
         isFeatured: currentProduct.isFeatured || false,
         isNewArrival: currentProduct.isNewArrival || false,
         isOnSale: currentProduct.isOnSale || false,
+        specifications: specsObj,
       };
 
       if (isNew) {
@@ -813,6 +853,69 @@ const ProductManagement = () => {
                           </label>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Specifications */}
+                    <div className="md:col-span-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Specifications
+                        </label>
+                        <button
+                          type="button"
+                          onClick={addSpecificationField}
+                          className="text-primary hover:text-primary-dark flex items-center text-sm"
+                        >
+                          <FiPlus size={16} className="mr-1" /> Add
+                          Specification
+                        </button>
+                      </div>
+
+                      {specifications.map((spec, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-5 gap-2 mb-2 items-start"
+                        >
+                          <input
+                            type="text"
+                            placeholder="Name (e.g., Weight)"
+                            className="col-span-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                            value={spec.key}
+                            onChange={(e) =>
+                              handleSpecificationChange(
+                                index,
+                                "key",
+                                e.target.value
+                              )
+                            }
+                          />
+                          <input
+                            type="text"
+                            placeholder="Value (e.g., 2.5 kg)"
+                            className="col-span-2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                            value={spec.value}
+                            onChange={(e) =>
+                              handleSpecificationChange(
+                                index,
+                                "value",
+                                e.target.value
+                              )
+                            }
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeSpecificationField(index)}
+                            className="p-2 text-red-500 hover:text-red-700 focus:outline-none"
+                            disabled={specifications.length === 1}
+                          >
+                            <FiTrash2 size={18} />
+                          </button>
+                        </div>
+                      ))}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Add product specifications like dimensions, material,
+                        etc.
+                      </p>
                     </div>
                   </div>
                 </div>

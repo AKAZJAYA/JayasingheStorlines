@@ -3,6 +3,30 @@ import api from "../../utils/api";
 
 const API_URL = "/products";
 
+// Helper function to transform Cloudinary URLs for optimization
+export const getOptimizedImageUrl = (url, options = {}) => {
+  if (!url || !url.includes("cloudinary.com")) return url;
+
+  // Default transformation options
+  const {
+    width = 600,
+    height = 600,
+    crop = "fill",
+    quality = "auto",
+    fetchFormat = "auto",
+  } = options;
+
+  // Extract base URL and transformation path
+  const baseUrl = url.split("/upload/")[0];
+  const imagePath = url.split("/upload/")[1];
+
+  // Build transformation string
+  const transformation = `w_${width},h_${height},c_${crop},q_${quality},f_${fetchFormat}`;
+
+  // Return transformed URL
+  return `${baseUrl}/upload/${transformation}/${imagePath}`;
+};
+
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async (params, { rejectWithValue }) => {
@@ -106,6 +130,37 @@ export const addProductReview = createAsyncThunk(
   }
 );
 
+// Add support for reporting image loading failures
+export const reportImageLoadFailure = createAsyncThunk(
+  "products/reportImageLoadFailure",
+  async ({ productId, imageUrl }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${API_URL}/${productId}/image-failure`, {
+        imageUrl,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to report image failure" }
+      );
+    }
+  }
+);
+
+export const fetchSimilarProducts = createAsyncThunk(
+  "products/fetchSimilarProducts",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/${productId}/similar`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch similar products" }
+      );
+    }
+  }
+);
+
 const initialState = {
   products: [],
   featuredProducts: {
@@ -119,6 +174,7 @@ const initialState = {
   currentProduct: null,
   loading: false,
   error: null,
+  imageErrors: {}, // Track image loading errors by productId
   filters: {
     category: null,
     priceRange: [0, Infinity],
@@ -148,6 +204,44 @@ const productSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    // Add a reducer to handle Cloudinary image transformations for product images
+    optimizeProductImages: (state) => {
+      if (state.products && state.products.length > 0) {
+        state.products = state.products.map((product) => ({
+          ...product,
+          imageUrl: product.imageUrl
+            ? getOptimizedImageUrl(product.imageUrl)
+            : product.imageUrl,
+          additionalImages: product.additionalImages
+            ? product.additionalImages.map((img) => getOptimizedImageUrl(img))
+            : product.additionalImages,
+        }));
+      }
+
+      if (state.currentProduct) {
+        state.currentProduct = {
+          ...state.currentProduct,
+          imageUrl: state.currentProduct.imageUrl
+            ? getOptimizedImageUrl(state.currentProduct.imageUrl)
+            : state.currentProduct.imageUrl,
+          additionalImages: state.currentProduct.additionalImages
+            ? state.currentProduct.additionalImages.map((img) =>
+                getOptimizedImageUrl(img)
+              )
+            : state.currentProduct.additionalImages,
+        };
+      }
+    },
+    // Track image loading failures
+    markImageLoadFailure: (state, action) => {
+      const { productId, imageUrl } = action.payload;
+      if (!state.imageErrors[productId]) {
+        state.imageErrors[productId] = [];
+      }
+      if (!state.imageErrors[productId].includes(imageUrl)) {
+        state.imageErrors[productId].push(imageUrl);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -257,12 +351,36 @@ const productSlice = createSlice({
       .addCase(addProductReview.fulfilled, (state, action) => {
         if (state.currentProduct) {
           state.currentProduct.reviews = action.payload.reviews;
-          state.currentProduct.rating = action.payload.rating;
+          state.currentProduct.ratings = action.payload.ratings;
         }
+      })
+      .addCase(reportImageLoadFailure.fulfilled, (state, action) => {
+        // Optional: Handle successful reporting of image load failures
+        // This could be used to update backend metrics or trigger notifications
+      })
+      .addCase(fetchSimilarProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSimilarProducts.fulfilled, (state, action) => {
+        state.similarProducts = action.payload.products || action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchSimilarProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message || "Failed to fetch similar products";
       });
   },
 });
 
-export const { setFilters, setPage, clearProductDetails, clearError } =
-  productSlice.actions;
+export const {
+  setFilters,
+  setPage,
+  clearProductDetails,
+  clearError,
+  optimizeProductImages,
+  markImageLoadFailure,
+} = productSlice.actions;
+
 export default productSlice.reducer;
