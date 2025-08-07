@@ -43,6 +43,8 @@ const ProductDetailsPage = () => {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewName, setReviewName] = useState("");
   const [reviewEmail, setReviewEmail] = useState("");
+  const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
+  const [wishlistSuccess, setWishlistSuccess] = useState(false);
 
   useEffect(() => {
     // Fetch product details when component mounts or id changes
@@ -72,7 +74,21 @@ const ProductDetailsPage = () => {
 
   const handleAddToWishlist = () => {
     if (product) {
-      dispatch(addToWishlist(product._id));
+      setIsAddingToWishlist(true);
+      dispatch(addToWishlist(product._id))
+        .unwrap()
+        .then(() => {
+          setWishlistSuccess(true);
+          // Reset success state after 2 seconds
+          setTimeout(() => setWishlistSuccess(false), 2000);
+        })
+        .catch((error) => {
+          // Handle error - could show a toast notification here
+          console.error("Failed to add to wishlist:", error);
+        })
+        .finally(() => {
+          setIsAddingToWishlist(false);
+        });
     }
   };
 
@@ -501,10 +517,21 @@ const ProductDetailsPage = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleAddToWishlist}
-                    className="p-3 rounded-md border border-gray-300 hover:border-primary hover:bg-primary-light text-gray-700 hover:text-primary"
+                    disabled={isAddingToWishlist}
+                    className={`p-3 rounded-md border ${
+                      wishlistSuccess
+                        ? "border-primary bg-primary-light text-primary"
+                        : "border-gray-300 hover:border-primary hover:bg-primary-light text-gray-700 hover:text-primary"
+                    } transition-colors`}
                     aria-label="Add to Wishlist"
                   >
-                    <FiHeart />
+                    {isAddingToWishlist ? (
+                      <span className="inline-block w-4 h-4 border-2 border-gray-500 border-t-primary rounded-full animate-spin"></span>
+                    ) : (
+                      <FiHeart
+                        className={wishlistSuccess ? "fill-primary" : ""}
+                      />
+                    )}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}

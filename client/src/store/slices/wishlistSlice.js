@@ -1,16 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../utils/api";
 
-const API_URL = "/api/users/wishlist";
+// The correct endpoint is under user routes
+const API_URL = "/users/wishlist";
 
 export const fetchWishlist = createAsyncThunk(
   "wishlist/fetchWishlist",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await api.get(API_URL);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch wishlist" }
+      );
     }
   }
 );
@@ -19,10 +22,12 @@ export const addToWishlist = createAsyncThunk(
   "wishlist/addToWishlist",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL, { productId });
+      const response = await api.post(API_URL, { productId });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to add to wishlist" }
+      );
     }
   }
 );
@@ -31,10 +36,12 @@ export const removeFromWishlist = createAsyncThunk(
   "wishlist/removeFromWishlist",
   async (productId, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}/${productId}`);
+      await api.delete(`${API_URL}/${productId}`);
       return productId;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to remove from wishlist" }
+      );
     }
   }
 );
@@ -104,7 +111,32 @@ const wishlistSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchWishlist.fulfilled, (state, action) => {
-        state.collections = action.payload;
+        // Transform the API response to match the expected structure
+        const wishlistItems = action.payload.wishlist || [];
+
+        // Create default "Favorites" collection if it doesn't exist
+        if (wishlistItems.length > 0) {
+          state.collections = [
+            {
+              id: "favorites",
+              name: "Favorites",
+              items: wishlistItems.map((item) => ({
+                id: item._id,
+                name: item.name,
+                image: item.imageUrl || item.image,
+                price: item.price,
+                discountedPrice: item.discountPrice || item.price,
+                discount: item.discountPercentage || 0,
+                stock: item.stock > 0,
+                addedOn: new Date().toLocaleDateString(),
+              })),
+              isOpen: true,
+            },
+          ];
+        } else {
+          state.collections = [];
+        }
+
         state.loading = false;
       })
       .addCase(fetchWishlist.rejected, (state, action) => {

@@ -68,32 +68,6 @@ const ProductCard = ({ product, index }) => {
               e.target.src = "/placeholder-image.jpg";
             }}
           />
-
-          {/* Hover overlay with actions */}
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex space-x-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddToCart();
-                }}
-                className="p-2 bg-white rounded-full text-primary hover:bg-primary hover:text-white transition-colors"
-                title="Add to Cart"
-              >
-                <FiShoppingCart size={18} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddToWishlist();
-                }}
-                className="p-2 bg-white rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-                title="Add to Wishlist"
-              >
-                <FiHeart size={18} />
-              </button>
-            </div>
-          </div>
         </div>
 
         <div className="p-4">
@@ -148,20 +122,32 @@ const ProductCard = ({ product, index }) => {
         </div>
       </Link>
 
-      {/* Add to Cart Button */}
-      <div className="px-4 pb-4">
+      {/* Add to Cart and Wishlist Buttons */}
+      <div className="px-4 pb-4 flex gap-2">
+        {/* Add to Cart Button */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAddToCart}
           disabled={product.stock === 0}
-          className={`w-full py-2 rounded-md font-medium transition-colors ${
+          className={`flex-1 py-2 rounded-md font-medium transition-colors ${
             product.stock === 0
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-primary text-white hover:bg-primary-dark"
           }`}
         >
           {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+        </motion.button>
+
+        {/* Add to Wishlist Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleAddToWishlist}
+          className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors"
+          aria-label="Add to Wishlist"
+        >
+          <FiHeart />
         </motion.button>
       </div>
     </motion.div>

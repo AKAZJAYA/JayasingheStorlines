@@ -7,10 +7,12 @@ import {
   FiList,
   FiChevronDown,
   FiShoppingCart,
+  FiHeart, // Add FiHeart import
 } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductsByCategory } from "../store/slices/productSlice";
 import { addToCart } from "../store/slices/cartSlice";
+import { addToWishlist } from "../store/slices/wishlistSlice"; // Add this import
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Newsletter from "../components/Newsletter";
@@ -89,6 +91,11 @@ const CategoryPage = () => {
         quantity: 1,
       })
     );
+  };
+
+  // Handle add to wishlist
+  const handleAddToWishlist = (productId) => {
+    dispatch(addToWishlist(productId));
   };
 
   // Sort products based on selected option
@@ -219,39 +226,123 @@ const CategoryPage = () => {
 
         {/* Products Grid/List */}
         {view === "grid" ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {sortedProducts.map((product) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {sortedProducts.map((product, index) => (
               <motion.div
                 key={product._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-lg shadow-md overflow-hidden group relative"
               >
-                <Link to={`/product/${product._id}`} className="block">
-                  <div className="aspect-square bg-gray-100">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="w-full h-full object-contain p-2"
-                    />
+                {/* Discount badge */}
+                {product.discountPrice && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
+                    {Math.round(
+                      ((product.price - product.discountPrice) /
+                        product.price) *
+                        100
+                    )}
+                    % OFF
                   </div>
+                )}
+
+                {/* Product badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                  {product.isFeatured && (
+                    <span className="bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                      Featured
+                    </span>
+                  )}
+                  {product.isNewArrival && (
+                    <span className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                      New
+                    </span>
+                  )}
+                  {product.isOnSale && (
+                    <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                      Sale
+                    </span>
+                  )}
+                </div>
+
+                <Link to={`/product/${product._id}`} className="block">
+                  <div className="relative pt-[75%] bg-gray-100 overflow-hidden">
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      src={product.imageUrl || "/placeholder-image.jpg"}
+                      alt={product.name}
+                      className="absolute inset-0 w-full h-full object-contain p-4"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.jpg";
+                      }}
+                    />
+
+                    {/* Removed the hover overlay with actions */}
+                  </div>
+
                   <div className="p-4">
-                    <h3 className="font-medium text-gray-900 mb-1">
+                    <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">
                       {product.name}
                     </h3>
-                    <p className="font-bold text-primary">
-                      Rs. {(product.price || 0).toLocaleString()}
-                    </p>
+
+                    {/* Price */}
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className="font-bold text-primary text-lg">
+                        Rs.{" "}
+                        {product.discountPrice
+                          ? (product.discountPrice || 0).toLocaleString()
+                          : (product.price || 0).toLocaleString()}
+                      </span>
+                      {product.discountPrice &&
+                        product.discountPrice < product.price && (
+                          <span className="text-gray-500 text-sm line-through">
+                            Rs. {(product.price || 0).toLocaleString()}
+                          </span>
+                        )}
+                    </div>
+
+                    {/* Stock status */}
+                    <div className="text-sm">
+                      {product.stock > 0 ? (
+                        <span className="text-green-600">
+                          {product.stock < 10
+                            ? `Only ${product.stock} left`
+                            : "In Stock"}
+                        </span>
+                      ) : (
+                        <span className="text-red-600">Out of Stock</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
-                <div className="px-4 pb-4">
-                  <button
+
+                <div className="px-4 pb-4 flex gap-2">
+                  {/* Add to Cart Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleAddToCart(product._id)}
-                    className="w-full bg-primary text-white py-2 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center justify-center"
+                    disabled={product.stock === 0}
+                    className={`flex-1 py-2 rounded-md font-medium transition-colors ${
+                      product.stock === 0
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-primary text-white hover:bg-primary-dark"
+                    }`}
                   >
-                    <FiShoppingCart className="mr-2" /> Add to Cart
-                  </button>
+                    {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                  </motion.button>
+
+                  {/* Add to Wishlist Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleAddToWishlist(product._id)}
+                    className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors"
+                    aria-label="Add to Wishlist"
+                  >
+                    <FiHeart />
+                  </motion.button>
                 </div>
               </motion.div>
             ))}

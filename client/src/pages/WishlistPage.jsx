@@ -209,44 +209,44 @@ const WishlistPage = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow relative group"
+                            className="bg-white rounded-lg shadow-md overflow-hidden group relative"
                           >
                             {/* Discount badge */}
                             {item.discount > 0 && (
-                              <div className="absolute top-2 left-2 bg-accent text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
+                              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
                                 {item.discount}% OFF
                               </div>
                             )}
 
-                            {/* Hover actions */}
-                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => handleAddToCart(item)}
-                                  className="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                                >
-                                  <FiShoppingCart size={18} />
-                                </button>
-                                <button
-                                  onClick={() => handleRemoveItem(item.id)}
-                                  className="w-10 h-10 rounded-full bg-white text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
-                                >
-                                  <FiTrash2 size={18} />
-                                </button>
-                                <button className="w-10 h-10 rounded-full bg-white text-gray-700 flex items-center justify-center hover:bg-gray-700 hover:text-white transition-colors">
-                                  <FiShare2 size={18} />
-                                </button>
-                              </div>
+                            {/* Product badges - add if needed */}
+                            <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                              {item.isFeatured && (
+                                <span className="bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                                  Featured
+                                </span>
+                              )}
+                              {item.isNewArrival && (
+                                <span className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                                  New
+                                </span>
+                              )}
+                              {item.isOnSale && (
+                                <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                                  Sale
+                                </span>
+                              )}
                             </div>
 
-                            {/* Product Image */}
                             <Link to={`/product/${item.id}`} className="block">
-                              <div className="aspect-square bg-gray-100 relative">
-                                <img
+                              <div className="relative pt-[75%] bg-gray-100 overflow-hidden">
+                                <motion.img
+                                  whileHover={{ scale: 1.05 }}
                                   src={item.image}
                                   alt={item.name}
-                                  className="w-full h-full object-contain p-4"
+                                  className="absolute inset-0 w-full h-full object-contain p-4"
                                 />
+
+                                {/* Out of stock overlay */}
                                 {!item.stock && (
                                   <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
                                     <div className="px-4 py-2 bg-red-100 text-red-800 rounded-md font-medium text-sm flex items-center">
@@ -258,11 +258,13 @@ const WishlistPage = () => {
                               </div>
 
                               <div className="p-4">
-                                <h3 className="font-medium text-gray-900 mb-1 truncate">
+                                <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">
                                   {item.name}
                                 </h3>
-                                <div className="flex items-center space-x-2">
-                                  <span className="font-bold text-primary">
+
+                                {/* Price */}
+                                <div className="flex items-center space-x-2 mb-3">
+                                  <span className="font-bold text-primary text-lg">
                                     Rs. {formatter.format(item.discountedPrice)}
                                   </span>
                                   {item.discount > 0 && (
@@ -271,34 +273,50 @@ const WishlistPage = () => {
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-xs text-gray-500 mt-2">
-                                  Added on: {item.addedOn}
+
+                                {/* Stock status */}
+                                <div className="text-sm">
+                                  {item.stock ? (
+                                    <span className="text-green-600">
+                                      {item.stock < 10
+                                        ? `Only ${item.stock} left`
+                                        : "In Stock"}
+                                    </span>
+                                  ) : (
+                                    <span className="text-red-600">
+                                      Out of Stock
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </Link>
 
-                            <div className="border-t border-gray-200 p-4 flex justify-between items-center">
-                              <div className="text-sm">
-                                {item.stock ? (
-                                  <span className="text-green-600 flex items-center">
-                                    <span className="w-2 h-2 bg-green-600 rounded-full mr-1"></span>{" "}
-                                    In Stock
-                                  </span>
-                                ) : (
-                                  <span className="text-red-600 flex items-center">
-                                    <span className="w-2 h-2 bg-red-600 rounded-full mr-1"></span>{" "}
-                                    Out of Stock
-                                  </span>
-                                )}
-                              </div>
-                              {item.stock && (
-                                <button
-                                  onClick={() => handleAddToCart(item)}
-                                  className="bg-primary text-white px-3 py-1 rounded text-sm font-medium hover:bg-primary-dark transition-colors"
-                                >
-                                  Add to Cart
-                                </button>
-                              )}
+                            <div className="px-4 pb-4 flex gap-2">
+                              {/* Add to Cart Button */}
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleAddToCart(item)}
+                                disabled={!item.stock}
+                                className={`flex-1 py-2 rounded-md font-medium transition-colors ${
+                                  !item.stock
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-primary text-white hover:bg-primary-dark"
+                                }`}
+                              >
+                                {!item.stock ? "Out of Stock" : "Add to Cart"}
+                              </motion.button>
+
+                              {/* Remove from Wishlist Button */}
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleRemoveItem(item.id)}
+                                className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors"
+                                aria-label="Remove from Wishlist"
+                              >
+                                <FiTrash2 />
+                              </motion.button>
                             </div>
                           </motion.div>
                         ))}
