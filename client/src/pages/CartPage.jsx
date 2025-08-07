@@ -22,6 +22,7 @@ import {
   FiDollarSign,
   FiCreditCard as FiCard,
 } from "react-icons/fi";
+import { toast } from "react-toastify";
 import ServiceHighlights from "../components/ServiceHighlights";
 import Newsletter from "../components/Newsletter";
 import {
@@ -99,9 +100,11 @@ const CartPage = () => {
 
     dispatch(updateCartItem({ productId: id, quantity: newQuantity }))
       .unwrap()
+      .then(() => {
+        toast.success("Cart updated");
+      })
       .catch((error) => {
-        console.error("Failed to update quantity", error);
-        // Show error notification
+        toast.error(error.message || "Failed to update quantity");
       });
   };
 
@@ -109,9 +112,11 @@ const CartPage = () => {
   const handleRemoveFromCart = (id) => {
     dispatch(removeCartItem(id))
       .unwrap()
+      .then(() => {
+        toast.success("Item removed from cart");
+      })
       .catch((error) => {
-        console.error("Failed to remove item", error);
-        // Show error notification
+        toast.error(error.message || "Failed to remove item from cart");
       });
   };
 
@@ -122,11 +127,10 @@ const CartPage = () => {
     dispatch(applyPromoCode(promoCodeInput))
       .unwrap()
       .then(() => {
-        // Show success notification
+        toast.success("Promo code applied successfully!");
       })
       .catch((error) => {
-        console.error("Failed to apply promo code", error);
-        // Show error notification
+        toast.error(error.message || "Failed to apply promo code");
       });
   };
 
@@ -154,7 +158,14 @@ const CartPage = () => {
   // Handle clear cart
   const handleClearCart = () => {
     if (window.confirm("Are you sure you want to clear your cart?")) {
-      dispatch(clearCart());
+      dispatch(clearCart())
+        .unwrap()
+        .then(() => {
+          toast.success("Cart cleared");
+        })
+        .catch((error) => {
+          toast.error(error.message || "Failed to clear cart");
+        });
     }
   };
 
@@ -456,7 +467,9 @@ const CartPage = () => {
                   {promoDiscount > 0 && (
                     <div className="flex justify-between mb-2 text-green-600">
                       <span>Discount ({promoDiscount * 100}%)</span>
-                      <span>- Rs. {formatter.format(promoDiscount * subtotal)}</span>
+                      <span>
+                        - Rs. {formatter.format(promoDiscount * subtotal)}
+                      </span>
                     </div>
                   )}
 

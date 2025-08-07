@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { fetchNewArrivals } from "../store/slices/productSlice";
 import { addToCart } from "../store/slices/cartSlice";
 import { addToWishlist } from "../store/slices/wishlistSlice";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product, index }) => {
   const dispatch = useDispatch();
@@ -17,11 +18,25 @@ const ProductCard = ({ product, index }) => {
         productId: product._id,
         quantity: 1,
       })
-    );
+    )
+      .unwrap()
+      .then(() => {
+        toast.success(`${product.name} added to cart!`);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add item to cart");
+      });
   };
 
   const handleAddToWishlist = () => {
-    dispatch(addToWishlist(product._id));
+    dispatch(addToWishlist(product._id))
+      .unwrap()
+      .then(() => {
+        toast.success(`${product.name} added to wishlist!`);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add item to wishlist");
+      });
   };
 
   return (

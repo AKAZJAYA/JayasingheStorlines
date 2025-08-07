@@ -22,6 +22,7 @@ import {
   toggleCollection,
 } from "../store/slices/wishlistSlice";
 import { addToCart } from "../store/slices/cartSlice";
+import { toast } from "react-toastify";
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
@@ -45,10 +46,10 @@ const WishlistPage = () => {
     dispatch(removeFromWishlist(productId))
       .unwrap()
       .then(() => {
-        // Toast removed
+        toast.success("Item removed from wishlist");
       })
       .catch((error) => {
-        // Toast removed
+        toast.error(error.message || "Failed to remove from wishlist");
       });
   };
 
@@ -61,8 +62,12 @@ const WishlistPage = () => {
 
     dispatch(addToCart(productData))
       .unwrap()
-      .then(() => {})
-      .catch((error) => {});
+      .then(() => {
+        toast.success(`${item.name} added to cart!`);
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add item to cart");
+      });
   };
 
   // Filter items based on search

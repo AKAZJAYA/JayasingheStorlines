@@ -27,6 +27,7 @@ import Newsletter from "../components/Newsletter";
 import ServiceHighlights from "../components/ServiceHighlights";
 import FeaturedProducts from "../components/FeaturedProducts";
 import NewArrivals from "../components/NewArrivals";
+import { toast } from "react-toastify";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -68,7 +69,14 @@ const ProductDetailsPage = () => {
           productId: product._id,
           quantity: quantity,
         })
-      );
+      )
+        .unwrap()
+        .then(() => {
+          toast.success(`${product.name} added to cart!`);
+        })
+        .catch((error) => {
+          toast.error(error.message || "Failed to add item to cart");
+        });
     }
   };
 
@@ -79,12 +87,12 @@ const ProductDetailsPage = () => {
         .unwrap()
         .then(() => {
           setWishlistSuccess(true);
+          toast.success(`${product.name} added to wishlist!`);
           // Reset success state after 2 seconds
           setTimeout(() => setWishlistSuccess(false), 2000);
         })
         .catch((error) => {
-          // Handle error - could show a toast notification here
-          console.error("Failed to add to wishlist:", error);
+          toast.error(error.message || "Failed to add to wishlist");
         })
         .finally(() => {
           setIsAddingToWishlist(false);

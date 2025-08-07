@@ -24,6 +24,8 @@ import PaymentMethods from "./pages/PaymentMethods";
 import WarrantyInformation from "./pages/WarrantyInformation";
 import AuthCheck from "./components/AuthCheck";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   return (
@@ -69,6 +71,19 @@ const App = () => {
           </div>
         </SearchProvider>
       </BrowserRouter>
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 };
