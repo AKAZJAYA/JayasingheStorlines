@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -38,6 +38,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Use search context instead of local state
   const { searchQuery, setSearchQuery, performSearch } = useSearch();
@@ -54,6 +55,24 @@ const Navbar = () => {
 
   const dispatch = useDispatch();
 
+  // Add scroll event listener to detect when user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     performSearch(searchQuery);
@@ -65,8 +84,12 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top navbar */}
-      <div className="bg-white shadow-sm relative z-50">
+      {/* Top navbar - fixed when scrolled */}
+      <div
+        className={`bg-white shadow-sm z-50 ${
+          isScrolled ? "fixed top-0 left-0 right-0 animate-fadeIn" : "relative"
+        } transition-all duration-300`}
+      >
         <div className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {/* Logo */}
@@ -240,8 +263,15 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Add a spacer div when navbar is fixed to prevent content jumping */}
+      {isScrolled && <div className="h-[60px]"></div>}
+
       {/* Categories navbar */}
-      <div className="bg-primary text-white relative z-40">
+      <div
+        className={`bg-primary text-white ${
+          isScrolled ? "relative" : "relative"
+        } z-40`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex items-center h-10">
             <div className="hidden md:flex items-center space-x-6 text-sm">
@@ -419,5 +449,14 @@ const Navbar = () => {
     </>
   );
 };
+
+// Add this to your index.css to enable the fade-in animation
+// @keyframes fadeIn {
+//   from { opacity: 0.8; transform: translateY(-10px); }
+//   to { opacity: 1; transform: translateY(0); }
+// }
+// .animate-fadeIn {
+//   animation: fadeIn 0.3s ease-in-out forwards;
+// }
 
 export default Navbar;

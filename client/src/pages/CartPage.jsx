@@ -456,9 +456,7 @@ const CartPage = () => {
                   {promoDiscount > 0 && (
                     <div className="flex justify-between mb-2 text-green-600">
                       <span>Discount ({promoDiscount * 100}%)</span>
-                      <span>
-                        - Rs. {formatter.format(promoDiscount * subtotal)}
-                      </span>
+                      <span>- Rs. {formatter.format(promoDiscount * subtotal)}</span>
                     </div>
                   )}
 
