@@ -36,7 +36,7 @@ const ProductDetailsPage = () => {
     loading,
     error,
   } = useSelector((state) => state.products);
-  const [activeImage, setActiveImage] = useState(0);
+  const [activeImage, setActiveImage] = useState(-1);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [reviewRating, setReviewRating] = useState(5);
@@ -218,9 +218,10 @@ const ProductDetailsPage = () => {
                 {/* Main Product Image */}
                 <img
                   src={
-                    product.additionalImages &&
-                    product.additionalImages.length > 0 &&
-                    activeImage < product.additionalImages.length
+                    activeImage === -1
+                      ? product.imageUrl
+                      : product.additionalImages &&
+                        activeImage < product.additionalImages.length
                       ? product.additionalImages[activeImage]
                       : product.imageUrl
                   }
@@ -242,14 +243,16 @@ const ProductDetailsPage = () => {
 
                 {/* Image Navigation Arrows */}
                 {product.additionalImages &&
-                  product.additionalImages.length > 1 && (
+                  product.additionalImages.length > 0 && (
                     <>
                       <button
                         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-gray-800 focus:outline-none transition-all duration-300"
                         onClick={() =>
                           setActiveImage((prev) =>
-                            prev === 0
+                            prev === -1
                               ? product.additionalImages.length - 1
+                              : prev === 0
+                              ? -1
                               : prev - 1
                           )
                         }
@@ -261,6 +264,8 @@ const ProductDetailsPage = () => {
                         onClick={() =>
                           setActiveImage((prev) =>
                             prev === product.additionalImages.length - 1
+                              ? -1
+                              : prev === -1
                               ? 0
                               : prev + 1
                           )
@@ -601,9 +606,7 @@ const ProductDetailsPage = () => {
                 >
                   <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-          
-                      </thead>
+                      <thead className="bg-gray-50"></thead>
                       <tbody className="divide-y divide-gray-200">
                         {product.specifications &&
                         Object.keys(product.specifications).length > 0 ? (
