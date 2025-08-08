@@ -49,6 +49,7 @@ const ProductManagement = () => {
   const [specifications, setSpecifications] = useState([
     { key: "", value: "" },
   ]);
+  const [viewProduct, setViewProduct] = useState(null);
 
   // Categories derived from product data - fallback to common categories
   const categories = [
@@ -262,6 +263,10 @@ const ProductManagement = () => {
     setSortConfig({ key, direction });
   };
 
+  const handleRowClick = (product) => {
+    setViewProduct(product);
+  };
+
   if (loading && !products.length) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -408,7 +413,11 @@ const ProductManagement = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {products.map((product) => (
-                <tr key={product._id} className="hover:bg-gray-50">
+                <tr
+                  key={product._id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleRowClick(product)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden">
@@ -475,13 +484,19 @@ const ProductManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleEdit(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(product);
+                        }}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         <FiEdit size={16} />
                       </button>
                       <button
-                        onClick={() => handleDelete(product._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(product._id);
+                        }}
                         className="text-red-600 hover:text-red-900"
                       >
                         <FiTrash2 size={16} />
@@ -942,6 +957,224 @@ const ProductManagement = () => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Product Details Modal */}
+      <AnimatePresence>
+        {viewProduct && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setViewProduct(null)}
+          >
+            <motion.div
+              className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Product Details
+                </h2>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => {
+                      setViewProduct(null);
+                      handleEdit(viewProduct);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                  >
+                    <FiEdit size={16} className="mr-1" /> Edit
+                  </button>
+                  <button
+                    onClick={() => setViewProduct(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <FiX size={20} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Product Image */}
+                <div className="md:col-span-1">
+                  <div className="rounded-lg overflow-hidden border border-gray-200">
+                    <img
+                      src={
+                        viewProduct.imageUrl ||
+                        "https://placehold.co/600x400/333/FFF?text=No+Image"
+                      }
+                      alt={viewProduct.name || "Product"}
+                      className="w-full h-auto object-contain"
+                    />
+                  </div>
+
+                  {/* Additional Images (thumbnails) */}
+                  {viewProduct.additionalImages &&
+                    viewProduct.additionalImages.length > 0 && (
+                      <div className="grid grid-cols-4 gap-2 mt-3">
+                        {viewProduct.additionalImages.map((img, idx) => (
+                          <div
+                            key={idx}
+                            className="border border-gray-200 rounded-md overflow-hidden"
+                          >
+                            <img
+                              src={img}
+                              alt={`${viewProduct.name} - ${idx + 1}`}
+                              className="w-full h-full object-contain aspect-square"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {/* Flags/Badges */}
+                  {(viewProduct.isFeatured ||
+                    viewProduct.isNewArrival ||
+                    viewProduct.isOnSale) && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {viewProduct.isFeatured && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                          Featured
+                        </span>
+                      )}
+                      {viewProduct.isNewArrival && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                          New Arrival
+                        </span>
+                      )}
+                      {viewProduct.isOnSale && (
+                        <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
+                          On Sale
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div className="md:col-span-2 space-y-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {viewProduct.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      SKU: {viewProduct.sku}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Category
+                      </h4>
+                      <p>{viewProduct.category || "N/A"}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Status
+                      </h4>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          viewProduct.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : viewProduct.status === "inactive"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {viewProduct.status || "Unknown"}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Price
+                      </h4>
+                      <p className="font-bold text-gray-900">
+                        Rs. {viewProduct.price?.toLocaleString() || "0"}
+                      </p>
+                      {viewProduct.discountPrice > 0 && (
+                        <p className="text-sm text-gray-500 line-through">
+                          Rs. {viewProduct.discountPrice.toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">
+                        Stock
+                      </h4>
+                      <p
+                        className={`${
+                          viewProduct.stock === 0
+                            ? "text-red-600"
+                            : viewProduct.stock <= 10
+                            ? "text-yellow-600"
+                            : "text-green-600"
+                        }`}
+                      >
+                        {viewProduct.stock || 0} units
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">
+                      Description
+                    </h4>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {viewProduct.description || "No description available."}
+                    </p>
+                  </div>
+
+                  {/* Specifications */}
+                  {viewProduct.specifications &&
+                    Object.keys(viewProduct.specifications).length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-500 mb-2">
+                          Specifications
+                        </h4>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <table className="min-w-full">
+                            <tbody>
+                              {Object.entries(viewProduct.specifications).map(
+                                ([key, value]) => (
+                                  <tr
+                                    key={key}
+                                    className="border-b border-gray-200 last:border-b-0"
+                                  >
+                                    <td className="py-2 text-sm font-medium text-gray-900 pr-4">
+                                      {key}
+                                    </td>
+                                    <td className="py-2 text-sm text-gray-700">
+                                      {value}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 p-4 bg-gray-50 flex justify-end">
+                <button
+                  onClick={() => setViewProduct(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                >
+                  Close
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

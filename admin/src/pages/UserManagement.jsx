@@ -452,7 +452,8 @@ const UserManagement = () => {
                   {users.map((user) => (
                     <tr
                       key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => handleViewUser(user)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -493,7 +494,10 @@ const UserManagement = () => {
                         {formatDate(user.joinDate || user.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
+                        <div
+                          className="flex justify-end space-x-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             className="text-gray-600 hover:text-primary"
                             onClick={() => handleViewUser(user)}

@@ -219,8 +219,11 @@ const MyOrdersPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
               >
-                {/* Order Header */}
-                <div className="p-6 border-b border-gray-200">
+                {/* Order Header - Made entire header clickable */}
+                <div
+                  className="p-6 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => toggleOrderDetails(order._id)}
+                >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="flex items-center">
@@ -248,16 +251,14 @@ const MyOrdersPage = () => {
                           Rs. {formatter.format(order.total)}
                         </div>
                       </div>
-                      <button
-                        onClick={() => toggleOrderDetails(order._id)}
-                        className="text-primary hover:text-primary-dark"
-                      >
+                      {/* Keep the chevron as a visual indicator only */}
+                      <div className="text-primary">
                         {expandedOrder === order._id ? (
                           <FiChevronUp size={24} />
                         ) : (
                           <FiChevronDown size={24} />
                         )}
-                      </button>
+                      </div>
                     </div>
                   </div>
                 </div>
