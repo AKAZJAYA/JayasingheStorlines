@@ -26,6 +26,8 @@ import AuthCheck from "./components/AuthCheck";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
 const App = () => {
   return (
@@ -48,6 +50,11 @@ const App = () => {
                   <Route path="/my-orders" element={<MyOrdersPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route
+                    path="/order-confirmation/:orderId"
+                    element={<OrderConfirmationPage />}
+                  />
                 </Route>
 
                 {/* Public Routes */}
