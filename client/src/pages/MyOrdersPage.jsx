@@ -14,143 +14,23 @@ import {
   FiCalendar,
   FiMapPin,
   FiShield,
+  FiAlertCircle,
+  FiFileText,
 } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { cancelOrder, fetchUserOrders } from "../store/slices/orderSlice";
+import {
+  cancelOrder,
+  fetchUserOrders,
+  clearOrderError,
+} from "../store/slices/orderSlice";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Newsletter from "../components/Newsletter";
 import ServiceHighlights from "../components/ServiceHighlights";
 
-// Mock order data for demonstration
-const orderData = [
-  {
-    id: "JS24050789",
-    date: "May 7, 2024",
-    status: "Delivered",
-    total: 374999,
-    items: [
-      {
-        id: "phone",
-        name: "Samsung Galaxy S24 Ultra",
-        price: 374999,
-        quantity: 1,
-        image:
-          "https://images.unsplash.com/photo-1567581935884-3349723552ca?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      },
-    ],
-    trackingHistory: [
-      {
-        status: "Order Placed",
-        date: "May 7, 2024 - 10:35 AM",
-        completed: true,
-      },
-      {
-        status: "Payment Confirmed",
-        date: "May 7, 2024 - 11:20 AM",
-        completed: true,
-      },
-      { status: "Processing", date: "May 7, 2024 - 2:45 PM", completed: true },
-      { status: "Shipped", date: "May 8, 2024 - 9:30 AM", completed: true },
-      {
-        status: "Out for Delivery",
-        date: "May 9, 2024 - 8:15 AM",
-        completed: true,
-      },
-      { status: "Delivered", date: "May 9, 2024 - 2:40 PM", completed: true },
-    ],
-    deliveryAddress: {
-      name: "John Doe",
-      address: "42 Main Street, Colombo 04",
-      phone: "071-1234567",
-    },
-  },
-  {
-    id: "JS24042512",
-    date: "April 25, 2024",
-    status: "Processing",
-    total: 199999,
-    items: [
-      {
-        id: "tv",
-        name: "LG 43 Inch UHD 4K Smart TV",
-        price: 199999,
-        quantity: 1,
-        image:
-          "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      },
-    ],
-    trackingHistory: [
-      {
-        status: "Order Placed",
-        date: "April 25, 2024 - 3:15 PM",
-        completed: true,
-      },
-      {
-        status: "Payment Confirmed",
-        date: "April 25, 2024 - 3:30 PM",
-        completed: true,
-      },
-      {
-        status: "Processing",
-        date: "April 26, 2024 - 10:20 AM",
-        completed: true,
-      },
-      { status: "Shipped", date: "Estimated April 29, 2024", completed: false },
-      { status: "Out for Delivery", date: "Pending", completed: false },
-      { status: "Delivered", date: "Pending", completed: false },
-    ],
-    deliveryAddress: {
-      name: "John Doe",
-      address: "42 Main Street, Colombo 04",
-      phone: "071-1234567",
-    },
-  },
-  {
-    id: "JS24031856",
-    date: "March 18, 2024",
-    status: "Cancelled",
-    total: 15990,
-    items: [
-      {
-        id: "speaker",
-        name: "Bluetooth Speaker",
-        price: 15990,
-        quantity: 1,
-        image:
-          "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      },
-    ],
-    trackingHistory: [
-      {
-        status: "Order Placed",
-        date: "March 18, 2024 - 5:45 PM",
-        completed: true,
-      },
-      {
-        status: "Payment Confirmed",
-        date: "March 18, 2024 - 5:55 PM",
-        completed: true,
-      },
-      {
-        status: "Cancelled",
-        date: "March 19, 2024 - 9:30 AM",
-        completed: true,
-        isCancellation: true,
-      },
-    ],
-    cancellationReason: "Customer requested cancellation",
-    deliveryAddress: {
-      name: "John Doe",
-      address: "42 Main Street, Colombo 04",
-      phone: "071-1234567",
-    },
-  },
-];
-
 const MyOrdersPage = () => {
   const dispatch = useDispatch();
-  const { orders, loading } = useSelector((state) => state.orders);
+  const { orders, loading, error } = useSelector((state) => state.orders);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -160,7 +40,22 @@ const MyOrdersPage = () => {
 
   // Fetch orders on component mount
   useEffect(() => {
-    dispatch(fetchUserOrders());
+    // Use a try-catch block to handle potential errors
+    const fetchOrders = async () => {
+      try {
+        // Use unwrap() to properly handle promise rejection
+        await dispatch(fetchUserOrders()).unwrap();
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    fetchOrders();
+
+    // Clear any errors when component unmounts
+    return () => {
+      dispatch(clearOrderError());
+    };
   }, [dispatch]);
 
   // Toggle order details
@@ -169,29 +64,25 @@ const MyOrdersPage = () => {
   };
 
   // Filter orders based on status and search query
-  const filteredOrders = Array.isArray(orders)
-    ? orders.filter((order) => {
-        const matchesStatus =
-          filterStatus === "all" ||
-          order.status.toLowerCase() === filterStatus.toLowerCase();
-        const matchesSearch =
-          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.items.some((item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        return matchesStatus && matchesSearch;
-      })
-    : orderData.filter((order) => {
-        const matchesStatus =
-          filterStatus === "all" ||
-          order.status.toLowerCase() === filterStatus.toLowerCase();
-        const matchesSearch =
-          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.items.some((item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        return matchesStatus && matchesSearch;
-      });
+  const filteredOrders =
+    Array.isArray(orders) && orders.length > 0
+      ? orders.filter((order) => {
+          const matchesStatus =
+            filterStatus === "all" ||
+            order.status.toLowerCase() === filterStatus.toLowerCase();
+          const matchesSearch =
+            (order.orderNumber || order._id || "")
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            (order.items &&
+              order.items.some((item) =>
+                (item.name || "")
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())
+              ));
+          return matchesStatus && matchesSearch;
+        })
+      : [];
 
   // Get status color
   const getStatusColor = (status) => {
@@ -257,6 +148,16 @@ const MyOrdersPage = () => {
           <p className="text-gray-600">Track and manage your orders</p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+            <div className="flex">
+              <FiAlertCircle className="text-red-400 mt-0.5 mr-2" />
+              <p className="text-red-700">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Filters and Search */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -303,12 +204,17 @@ const MyOrdersPage = () => {
           </div>
         </div>
 
-        {/* Orders List */}
-        {filteredOrders.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p className="text-gray-600">Loading your orders...</p>
+          </div>
+        ) : filteredOrders.length > 0 ? (
           <div className="space-y-6">
             {filteredOrders.map((order) => (
               <motion.div
-                key={order.id}
+                key={order._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
@@ -318,7 +224,9 @@ const MyOrdersPage = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="flex items-center">
-                        <h3 className="font-bold text-lg">Order #{order.id}</h3>
+                        <h3 className="font-bold text-lg">
+                          Order #{order.orderNumber || order._id}
+                        </h3>
                         <span
                           className={`ml-4 px-3 py-1 rounded-full text-xs font-medium inline-flex items-center ${getStatusColor(
                             order.status
@@ -329,7 +237,8 @@ const MyOrdersPage = () => {
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        Placed on {order.date}
+                        Placed on{" "}
+                        {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="mt-4 sm:mt-0 flex items-center space-x-4">
@@ -340,10 +249,10 @@ const MyOrdersPage = () => {
                         </div>
                       </div>
                       <button
-                        onClick={() => toggleOrderDetails(order.id)}
+                        onClick={() => toggleOrderDetails(order._id)}
                         className="text-primary hover:text-primary-dark"
                       >
-                        {expandedOrder === order.id ? (
+                        {expandedOrder === order._id ? (
                           <FiChevronUp size={24} />
                         ) : (
                           <FiChevronDown size={24} />
@@ -354,141 +263,312 @@ const MyOrdersPage = () => {
                 </div>
 
                 {/* Order Details (expanded) */}
-                {expandedOrder === order.id && (
+                {expandedOrder === order._id && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {/* Order Items */}
-                    <div className="p-6 border-b border-gray-200">
-                      <h4 className="font-semibold mb-4">Order Items</h4>
-                      <div className="space-y-4">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex items-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-full h-full object-contain p-2"
-                              />
-                            </div>
-                            <div className="ml-4 flex-grow">
-                              <Link
-                                to={`/product/${item.id}`}
-                                className="font-medium hover:text-primary"
-                              >
-                                {item.name}
-                              </Link>
-                              <div className="flex justify-between mt-1">
-                                <div className="text-sm text-gray-600">
-                                  Qty: {item.quantity}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+                      {/* Left Column - Order Details */}
+                      <div className="lg:col-span-2 space-y-6">
+                        {/* Order Items */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                          <div className="p-4 border-b border-gray-200">
+                            <h3 className="font-semibold text-lg">Items</h3>
+                          </div>
+                          <div className="p-4">
+                            <div className="space-y-4">
+                              {order.items.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center border-b border-gray-200 pb-4"
+                                >
+                                  <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden">
+                                    <img
+                                      src={item.imageUrl}
+                                      alt={item.name}
+                                      className="w-full h-full object-contain p-2"
+                                    />
+                                  </div>
+                                  <div className="ml-4 flex-grow">
+                                    <Link
+                                      to={`/product/${item.product}`}
+                                      className="font-medium hover:text-primary"
+                                    >
+                                      {item.name}
+                                    </Link>
+                                    <div className="flex justify-between mt-1">
+                                      <div className="text-sm text-gray-600">
+                                        Qty: {item.quantity}
+                                      </div>
+                                      <div className="font-semibold">
+                                        Rs.{" "}
+                                        {formatter.format(
+                                          item.price * item.quantity
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="font-semibold">
-                                  Rs. {formatter.format(item.price)}
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Order Summary */}
+                          <div className="p-4 bg-gray-50">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Subtotal</span>
+                                <span className="font-medium">
+                                  Rs. {formatter.format(order.subtotal)}
+                                </span>
+                              </div>
+                              {order.discount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                  <span>Discount</span>
+                                  <span>
+                                    - Rs. {formatter.format(order.discount)}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Shipping</span>
+                                <span className="font-medium">
+                                  Rs. {formatter.format(order.shippingCost)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200 mt-2">
+                                <span>Total</span>
+                                <span>Rs. {formatter.format(order.total)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Delivery Timeline */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                          <div className="p-4 border-b border-gray-200">
+                            <h3 className="font-semibold text-lg">
+                              Delivery Timeline
+                            </h3>
+                          </div>
+                          <div className="p-4">
+                            <div className="relative">
+                              {/* Connecting Line */}
+                              <div className="absolute left-3.5 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                              <div className="space-y-6 relative">
+                                <div className="flex">
+                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center z-10">
+                                    <FiCheckCircle className="text-green-500" />
+                                  </div>
+                                  <div className="ml-4">
+                                    <h4 className="font-medium">
+                                      Order Placed
+                                    </h4>
+                                    <p className="text-sm text-gray-500">
+                                      {new Date(
+                                        order.createdAt
+                                      ).toLocaleString()}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      Your order has been received and is being
+                                      processed.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex">
+                                  <div
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full ${
+                                      order.status === "processing"
+                                        ? "bg-blue-100"
+                                        : "bg-gray-100"
+                                    } flex items-center justify-center z-10`}
+                                  >
+                                    <FiClock
+                                      className={
+                                        order.status === "processing"
+                                          ? "text-blue-500"
+                                          : "text-gray-400"
+                                      }
+                                    />
+                                  </div>
+                                  <div className="ml-4">
+                                    <h4 className="font-medium">Processing</h4>
+                                    <p className="text-sm text-gray-500">
+                                      Estimated:{" "}
+                                      {new Date(
+                                        new Date(order.createdAt).getTime() +
+                                          24 * 60 * 60 * 1000
+                                      ).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      Your order is being prepared for shipping.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex">
+                                  <div
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full ${
+                                      order.status === "shipped"
+                                        ? "bg-purple-100"
+                                        : "bg-gray-100"
+                                    } flex items-center justify-center z-10`}
+                                  >
+                                    <FiTruck
+                                      className={
+                                        order.status === "shipped"
+                                          ? "text-purple-500"
+                                          : "text-gray-400"
+                                      }
+                                    />
+                                  </div>
+                                  <div className="ml-4">
+                                    <h4 className="font-medium">Shipping</h4>
+                                    <p className="text-sm text-gray-500">
+                                      Estimated:{" "}
+                                      {new Date(
+                                        new Date(order.createdAt).getTime() +
+                                          2 * 24 * 60 * 60 * 1000
+                                      ).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      Your order will be handed to our delivery
+                                      partner.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex">
+                                  <div
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full ${
+                                      order.status === "delivered" ||
+                                      order.status === "out for delivery"
+                                        ? "bg-green-100"
+                                        : "bg-gray-100"
+                                    } flex items-center justify-center z-10`}
+                                  >
+                                    <FiPackage
+                                      className={
+                                        order.status === "delivered" ||
+                                        order.status === "out for delivery"
+                                          ? "text-green-500"
+                                          : "text-gray-400"
+                                      }
+                                    />
+                                  </div>
+                                  <div className="ml-4">
+                                    <h4 className="font-medium">Delivery</h4>
+                                    <p className="text-sm text-gray-500">
+                                      Estimated:{" "}
+                                      {new Date(
+                                        new Date(order.createdAt).getTime() +
+                                          5 * 24 * 60 * 60 * 1000
+                                      ).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      Your order will be delivered to your
+                                      address.
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Shipping Information */}
-                    <div className="p-6 border-b border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-semibold mb-4 flex items-center">
-                            <FiMapPin className="mr-2 text-primary" />
-                            Delivery Address
-                          </h4>
-                          <div className="text-gray-700">
+                      {/* Right Column - Side Information */}
+                      <div className="space-y-6">
+                        {/* Shipping Information */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                          <div className="p-4 border-b border-gray-200">
+                            <h3 className="font-semibold flex items-center">
+                              <FiMapPin className="mr-2 text-primary" />{" "}
+                              Shipping Address
+                            </h3>
+                          </div>
+                          <div className="p-4">
                             <p className="font-medium">
-                              {order.deliveryAddress.name}
+                              {order.shippingInfo.firstName}{" "}
+                              {order.shippingInfo.lastName}
                             </p>
-                            <p>{order.deliveryAddress.address}</p>
-                            <p>{order.deliveryAddress.phone}</p>
+                            <p>{order.shippingInfo.address}</p>
+                            <p>
+                              {order.shippingInfo.city},{" "}
+                              {order.shippingInfo.province}{" "}
+                              {order.shippingInfo.postalCode}
+                            </p>
+                            <p>{order.shippingInfo.phone}</p>
                           </div>
                         </div>
 
-                        <div>
-                          <h4 className="font-semibold mb-4 flex items-center">
-                            <FiShield className="mr-2 text-primary" />
-                            Order Protection
-                          </h4>
-                          <p className="text-gray-700">
-                            All products in this order are covered by our
-                            standard warranty policy. If you face any issues,
-                            please contact our customer service.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Order Timeline */}
-                    <div className="p-6">
-                      <h4 className="font-semibold mb-4">Order Timeline</h4>
-                      <div className="relative pl-8 space-y-6 pb-2">
-                        {/* Vertical line */}
-                        <div className="absolute left-3 top-2 bottom-0 w-0.5 bg-gray-200"></div>
-
-                        {order.trackingHistory.map((step, index) => (
-                          <div key={index} className="relative">
-                            {/* Status dot */}
-                            <div
-                              className={`absolute -left-8 w-6 h-6 rounded-full flex items-center justify-center ${
-                                step.completed
-                                  ? step.isCancellation
-                                    ? "bg-red-500"
-                                    : "bg-primary"
-                                  : "bg-gray-200"
-                              }`}
-                            >
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            </div>
-
-                            <div>
-                              <h5
-                                className={`font-medium ${
-                                  step.isCancellation ? "text-red-600" : ""
-                                }`}
-                              >
-                                {step.status}
-                              </h5>
-                              <p className="text-sm text-gray-500">
-                                {step.date}
-                              </p>
-                              {step.isCancellation &&
-                                order.cancellationReason && (
-                                  <p className="text-sm mt-1 text-red-600">
-                                    Reason: {order.cancellationReason}
-                                  </p>
-                                )}
+                        {/* Payment Information */}
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                          <div className="p-4 border-b border-gray-200">
+                            <h3 className="font-semibold flex items-center">
+                              <FiFileText className="mr-2 text-primary" />{" "}
+                              Payment Details
+                            </h3>
+                          </div>
+                          <div className="p-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Method</span>
+                                <span className="font-medium">
+                                  {order.paymentMethod}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Status</span>
+                                <span
+                                  className={`font-medium ${
+                                    order.paymentDetails?.status === "paid"
+                                      ? "text-green-600"
+                                      : "text-yellow-600"
+                                  }`}
+                                >
+                                  {order.paymentDetails?.status || "Processing"}
+                                </span>
+                              </div>
+                              {order.paymentDetails?.transactionId && (
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">
+                                    Transaction ID
+                                  </span>
+                                  <span className="font-medium">
+                                    {order.paymentDetails.transactionId}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        ))}
+                        </div>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="p-6 bg-gray-50 flex flex-wrap gap-4 justify-end">
-                      {order.status !== "Cancelled" &&
-                        order.status !== "Delivered" && (
+                    <div className="p-6 bg-gray-50 flex flex-wrap gap-4 justify-end border-t border-gray-200">
+                      {order.status !== "cancelled" &&
+                        order.status !== "delivered" && (
                           <button
-                            onClick={() => handleCancelOrder(order.id)}
+                            onClick={() => handleCancelOrder(order._id)}
                             className="px-4 py-2 border border-red-500 text-red-500 rounded-md font-medium hover:bg-red-50"
                           >
                             Cancel Order
                           </button>
                         )}
                       <Link
-                        to={`/support/order/${order.id}`}
+                        to={`/support/order/${order._id}`}
                         className="px-4 py-2 border border-primary text-primary rounded-md font-medium hover:bg-primary/10"
                       >
                         Need Help?
                       </Link>
-                      {order.status === "Delivered" && (
+                      {order.status === "delivered" && (
                         <button className="px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark">
                           Write a Review
                         </button>

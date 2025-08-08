@@ -38,7 +38,7 @@ export const fetchUserOrders = createAsyncThunk(
   "orders/fetchUserOrders",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${API_URL}/my-orders`, { params });
+      const response = await api.get(`${API_URL}`, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -53,7 +53,9 @@ export const cancelOrder = createAsyncThunk(
   "orders/cancelOrder",
   async (orderId, { rejectWithValue }) => {
     try {
-      const response = await api.put(`${API_URL}/${orderId}/cancel`);
+      const response = await api.put(`${API_URL}/${orderId}/cancel`, {
+        reason: "Cancelled by customer",
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(
