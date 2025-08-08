@@ -64,7 +64,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderNumber: {
     type: String,
-    required: true,
+    // required: true,
     unique: true
   },
   items: [orderItemSchema],

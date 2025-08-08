@@ -221,6 +221,7 @@ const CheckoutPage = () => {
         total,
         notes: orderNotes,
         promoCode: promoCode || null,
+        orderNumber: `TEMP-${Date.now()}`, // Add a temporary order number
       };
 
       // Dispatch create order action
