@@ -57,8 +57,8 @@ const Layout = () => {
     { name: "User Management", icon: <FiUsers />, href: "/users" },
     { name: "Products", icon: <FiShoppingBag />, href: "/products" },
     { name: "Orders", icon: <FiShoppingCart />, href: "/orders" },
-    { name: "Deliveries", href: "/deliveries", icon: <FiTruck /> },
-    { name: "Sales", icon: <FiBarChart2 />, href: "/sales" },
+    // { name: "Deliveries", href: "/deliveries", icon: <FiTruck /> },
+    // { name: "Sales", icon: <FiBarChart2 />, href: "/sales" },
     { name: "Settings", icon: <FiSettings />, href: "/settings" },
   ];
 

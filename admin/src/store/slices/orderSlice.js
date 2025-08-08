@@ -1,17 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../utils/api"; // Use the configured API instance instead of axios directly
 
-const API_URL = "/api/admin/orders";
+const API_URL = "/admin/orders"; // Remove /api prefix as it's handled by the API configuration
 
 // Async thunks
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL, { params });
+      const response = await api.get(API_URL, { params });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch orders" }
+      );
     }
   }
 );
@@ -20,10 +22,12 @@ export const fetchOrderStats = createAsyncThunk(
   "orders/fetchOrderStats",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/stats`);
+      const response = await api.get(`${API_URL}/stats`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch order stats" }
+      );
     }
   }
 );
@@ -32,10 +36,12 @@ export const fetchOrder = createAsyncThunk(
   "orders/fetchOrder",
   async (orderId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/${orderId}`);
+      const response = await api.get(`${API_URL}/${orderId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to fetch order" }
+      );
     }
   }
 );
@@ -44,10 +50,14 @@ export const updateOrderStatus = createAsyncThunk(
   "orders/updateOrderStatus",
   async ({ orderId, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/${orderId}/status`, { status });
+      const response = await api.put(`${API_URL}/${orderId}/status`, {
+        status,
+      });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to update order status" }
+      );
     }
   }
 );
@@ -56,10 +66,12 @@ export const updateOrder = createAsyncThunk(
   "orders/updateOrder",
   async ({ orderId, orderData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/${orderId}`, orderData);
+      const response = await api.put(`${API_URL}/${orderId}`, orderData);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to update order" }
+      );
     }
   }
 );
@@ -68,10 +80,12 @@ export const deleteOrder = createAsyncThunk(
   "orders/deleteOrder",
   async (orderId, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}/${orderId}`);
+      await api.delete(`${API_URL}/${orderId}`);
       return orderId;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Failed to delete order" }
+      );
     }
   }
 );
@@ -152,25 +166,37 @@ const orderSlice = createSlice({
         state.currentOrder = action.payload;
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
-        const index = state.orders.findIndex(order => order._id === action.payload._id);
+        const index = state.orders.findIndex(
+          (order) => order._id === action.payload._id
+        );
         if (index !== -1) {
           state.orders[index] = action.payload;
         }
-        if (state.currentOrder && state.currentOrder._id === action.payload._id) {
+        if (
+          state.currentOrder &&
+          state.currentOrder._id === action.payload._id
+        ) {
           state.currentOrder = action.payload;
         }
       })
       .addCase(updateOrder.fulfilled, (state, action) => {
-        const index = state.orders.findIndex(order => order._id === action.payload._id);
+        const index = state.orders.findIndex(
+          (order) => order._id === action.payload._id
+        );
         if (index !== -1) {
           state.orders[index] = action.payload;
         }
-        if (state.currentOrder && state.currentOrder._id === action.payload._id) {
+        if (
+          state.currentOrder &&
+          state.currentOrder._id === action.payload._id
+        ) {
           state.currentOrder = action.payload;
         }
       })
       .addCase(deleteOrder.fulfilled, (state, action) => {
-        state.orders = state.orders.filter(order => order._id !== action.payload);
+        state.orders = state.orders.filter(
+          (order) => order._id !== action.payload
+        );
         if (state.currentOrder && state.currentOrder._id === action.payload) {
           state.currentOrder = null;
         }
@@ -178,5 +204,6 @@ const orderSlice = createSlice({
   },
 });
 
-export const { setFilters, setPage, clearCurrentOrder, clearError } = orderSlice.actions;
+export const { setFilters, setPage, clearCurrentOrder, clearError } =
+  orderSlice.actions;
 export default orderSlice.reducer;
