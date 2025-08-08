@@ -182,7 +182,7 @@ const MyOrdersPage = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="pl-10 pr-8 py-2 border border-gray-300 rounded-md w-full md:w-48 focus:ring-primary focus:border-primary appearance-none"
+                  className="pl-10 pr-8 py-2 border border-gray-300 rounded-md w-full md:w-48 focus:ring-primary focus:border-primary appearance-none cursor-pointer"
                 >
                   <option value="all">All Orders</option>
                   <option value="processing">Processing</option>
@@ -558,23 +558,23 @@ const MyOrdersPage = () => {
                         order.status !== "delivered" && (
                           <button
                             onClick={() => handleCancelOrder(order._id)}
-                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md font-medium hover:bg-red-50"
+                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md font-medium hover:bg-red-50 cursor-pointer"
                           >
                             Cancel Order
                           </button>
                         )}
                       <Link
                         to={`/support/order/${order._id}`}
-                        className="px-4 py-2 border border-primary text-primary rounded-md font-medium hover:bg-primary/10"
+                        className="px-4 py-2 border border-primary text-primary rounded-md font-medium hover:bg-primary/10 cursor-pointer"
                       >
                         Need Help?
                       </Link>
                       {order.status === "delivered" && (
-                        <button className="px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark">
+                        <button className="px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark cursor-pointer">
                           Write a Review
                         </button>
                       )}
-                      <button className="px-4 py-2 bg-gray-800 text-white rounded-md font-medium hover:bg-gray-700">
+                      <button className="px-4 py-2 bg-gray-800 text-white rounded-md font-medium hover:bg-gray-700 cursor-pointer">
                         Download Invoice
                       </button>
                     </div>
@@ -596,7 +596,7 @@ const MyOrdersPage = () => {
             </p>
             <Link
               to="/"
-              className="inline-block px-6 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark"
+              className="inline-block px-6 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark cursor-pointer"
             >
               Start Shopping
             </Link>
@@ -607,7 +607,7 @@ const MyOrdersPage = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mt-8">
           <h3 className="text-lg font-bold mb-4">Need Help With Your Order?</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all">
+            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all cursor-pointer">
               <h4 className="font-medium mb-2">Return & Refund Policy</h4>
               <p className="text-sm text-gray-600 mb-3">
                 Learn about our easy return process and refund policies.
@@ -619,7 +619,7 @@ const MyOrdersPage = () => {
                 Read more
               </Link>
             </div>
-            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all">
+            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all cursor-pointer">
               <h4 className="font-medium mb-2">Shipping Information</h4>
               <p className="text-sm text-gray-600 mb-3">
                 Get details on delivery timeframes and tracking options.
@@ -631,7 +631,7 @@ const MyOrdersPage = () => {
                 Read more
               </Link>
             </div>
-            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all">
+            <div className="p-4 border border-gray-200 rounded-md hover:border-primary hover:shadow-md transition-all cursor-pointer">
               <h4 className="font-medium mb-2">Contact Customer Service</h4>
               <p className="text-sm text-gray-600 mb-3">
                 Our team is available 7 days a week to assist you.

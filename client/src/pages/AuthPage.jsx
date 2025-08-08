@@ -272,7 +272,7 @@ const AuthPage = () => {
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleTabChange("login")}
-                    className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                    className={`px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ${
                       activeTab === "login"
                         ? "bg-primary text-white"
                         : "bg-gray-100 text-gray-500 hover:bg-gray-200"
@@ -284,7 +284,7 @@ const AuthPage = () => {
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleTabChange("register")}
-                    className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                    className={`px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ${
                       activeTab === "register"
                         ? "bg-primary text-white"
                         : "bg-gray-100 text-gray-500 hover:bg-gray-200"
@@ -422,7 +422,7 @@ const AuthPage = () => {
                           <button
                             type="button"
                             onClick={togglePasswordVisibility}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                           >
                             {showPassword ? (
                               <FiEyeOff className="text-gray-400" />
@@ -474,18 +474,18 @@ const AuthPage = () => {
                               id="rememberMe"
                               checked={formData.rememberMe}
                               onChange={handleInputChange}
-                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded cursor-pointer"
                             />
                             <label
                               htmlFor="rememberMe"
-                              className="ml-2 block text-sm text-gray-700"
+                              className="ml-2 block text-sm text-gray-700 cursor-pointer"
                             >
                               Remember me
                             </label>
                           </div>
                           <Link
                             to="/forgot-password"
-                            className="text-sm text-primary hover:text-blue-800"
+                            className="text-sm text-primary hover:text-blue-800 cursor-pointer"
                           >
                             Forgot password?
                           </Link>
@@ -497,7 +497,7 @@ const AuthPage = () => {
                         whileTap={{ scale: 0.98 }}
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center"
+                        className="w-full bg-primary text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
                       >
                         {loading ? (
                           <span>Please wait...</span>
@@ -529,7 +529,7 @@ const AuthPage = () => {
                           whileHover={{ y: -2 }}
                           whileTap={{ scale: 0.95 }}
                           type="button"
-                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
                         >
                           <FaGoogle className="text-red-500" />
                         </motion.button>
@@ -537,7 +537,7 @@ const AuthPage = () => {
                           whileHover={{ y: -2 }}
                           whileTap={{ scale: 0.95 }}
                           type="button"
-                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
                         >
                           <FaFacebook className="text-blue-600" />
                         </motion.button>
@@ -545,7 +545,7 @@ const AuthPage = () => {
                           whileHover={{ y: -2 }}
                           whileTap={{ scale: 0.95 }}
                           type="button"
-                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
                         >
                           <FaApple />
                         </motion.button>

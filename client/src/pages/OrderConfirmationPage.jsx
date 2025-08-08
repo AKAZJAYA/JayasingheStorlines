@@ -53,7 +53,7 @@ const OrderConfirmationPage = () => {
           </p>
           <Link
             to="/my-orders"
-            className="inline-block px-6 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark"
+            className="inline-block px-6 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark cursor-pointer"
           >
             View My Orders
           </Link>
@@ -344,7 +344,7 @@ const OrderConfirmationPage = () => {
                 </p>
                 <Link
                   to="/contact-us"
-                  className="inline-flex items-center text-primary font-medium hover:underline"
+                  className="inline-flex items-center text-primary font-medium hover:underline cursor-pointer"
                 >
                   Contact Support <FiArrowRight className="ml-1" />
                 </Link>
@@ -356,13 +356,13 @@ const OrderConfirmationPage = () => {
               <div className="p-6">
                 <Link
                   to="/"
-                  className="w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center justify-center"
+                  className="w-full bg-primary text-white py-3 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center justify-center cursor-pointer"
                 >
                   Continue Shopping
                 </Link>
                 <Link
                   to="/my-orders"
-                  className="w-full mt-3 border border-gray-300 bg-white text-gray-700 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center"
+                  className="w-full mt-3 border border-gray-300 bg-white text-gray-700 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer"
                 >
                   View All Orders
                 </Link>

@@ -72,7 +72,7 @@ const ProductCard = ({ product, index }) => {
         )}
       </div>
 
-      <Link to={`/product/${product._id}`} className="block">
+      <Link to={`/product/${product._id}`} className="block cursor-pointer">
         <div className="relative pt-[75%] bg-gray-100 overflow-hidden">
           <motion.img
             whileHover={{ scale: 1.05 }}
@@ -148,7 +148,7 @@ const ProductCard = ({ product, index }) => {
           className={`flex-1 py-2 rounded-md font-medium transition-colors ${
             product.stock === 0
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-primary text-white hover:bg-primary-dark"
+              : "bg-primary text-white hover:bg-primary-dark cursor-pointer"
           }`}
         >
           {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
@@ -159,7 +159,7 @@ const ProductCard = ({ product, index }) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAddToWishlist}
-          className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors"
+          className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors cursor-pointer"
           aria-label="Add to Wishlist"
         >
           <FiHeart />
@@ -206,7 +206,7 @@ const OnSaleProducts = ({
             <p className="text-red-500 mb-4">{error}</p>
             <button
               onClick={() => dispatch(fetchOnSaleProducts())}
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark"
+              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark cursor-pointer"
             >
               Try Again
             </button>
@@ -246,7 +246,7 @@ const OnSaleProducts = ({
           {viewAll && (
             <motion.button
               whileHover={{ x: 5 }}
-              className="flex items-center text-primary font-medium hover:text-primary-dark"
+              className="flex items-center text-primary font-medium hover:text-primary-dark cursor-pointer"
             >
               View All <FiChevronRight className="ml-1" />
             </motion.button>
@@ -277,7 +277,7 @@ const OnSaleProducts = ({
           <div className="text-center mt-8">
             <Link
               to="/products?onSale=true"
-              className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
+              className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors cursor-pointer"
             >
               View All Sale Products ({onSaleProducts.length})
             </Link>

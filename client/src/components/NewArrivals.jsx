@@ -72,13 +72,13 @@ const ProductCard = ({ product, index }) => {
         )}
       </div>
 
-      <Link to={`/product/${product._id}`} className="block">
+      <Link to={`/product/${product._id}`} className="block cursor-pointer">
         <div className="relative pt-[75%] bg-gray-100 overflow-hidden">
           <motion.img
             whileHover={{ scale: 1.05 }}
             src={product.imageUrl || product.image || "/placeholder-image.jpg"}
             alt={product.name}
-            className="absolute inset-0 w-full h-full object-contain p-4"
+            className="absolute inset-0 w-full h-full object-contain p-4 cursor-pointer"
             onError={(e) => {
               e.target.src = "/placeholder-image.jpg";
             }}
@@ -145,7 +145,7 @@ const ProductCard = ({ product, index }) => {
           whileTap={{ scale: 0.98 }}
           onClick={handleAddToCart}
           disabled={product.stock === 0}
-          className={`flex-1 py-2 rounded-md font-medium transition-colors ${
+          className={`flex-1 py-2 rounded-md font-medium transition-colors cursor-pointer ${
             product.stock === 0
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-primary text-white hover:bg-primary-dark"
@@ -159,7 +159,7 @@ const ProductCard = ({ product, index }) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAddToWishlist}
-          className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors"
+          className="p-2 rounded-md border border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-500 transition-colors cursor-pointer"
           aria-label="Add to Wishlist"
         >
           <FiHeart />
@@ -209,7 +209,7 @@ const NewArrivals = ({
             <p className="text-red-500 mb-4">{error}</p>
             <button
               onClick={() => dispatch(fetchNewArrivals())}
-              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark"
+              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark cursor-pointer"
             >
               Try Again
             </button>
@@ -244,11 +244,11 @@ const NewArrivals = ({
           {viewAll && newArrivals.length > 0 && (
             <motion.button
               whileHover={{ x: 5 }}
-              className="flex items-center text-primary font-medium hover:text-primary-dark"
+              className="flex items-center text-primary font-medium hover:text-primary-dark cursor-pointer"
             >
               <Link
                 to="/products?newArrival=true"
-                className="flex items-center"
+                className="flex items-center cursor-pointer"
               >
                 View All <FiChevronRight className="ml-1" />
               </Link>
@@ -279,7 +279,7 @@ const NewArrivals = ({
           <div className="text-center mt-8">
             <Link
               to="/products?newArrival=true"
-              className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
+              className="inline-block bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors cursor-pointer"
             >
               View All New Arrivals ({newArrivals.length})
             </Link>

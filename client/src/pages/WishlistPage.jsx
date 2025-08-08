@@ -151,7 +151,7 @@ const WishlistPage = () => {
                 Organize your wishlist into separate collections
               </p>
             </div>
-            <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-primary-dark transition-colors">
+            <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm hover:bg-primary-dark transition-colors cursor-pointer">
               + Create Collection
             </button>
           </div>
@@ -189,7 +189,7 @@ const WishlistPage = () => {
                       </span>
                     </div>
                   </div>
-                  <button className="text-gray-500">
+                  <button className="text-gray-500 cursor-pointer">
                     {collection.isOpen ? (
                       <FiChevronUp size={24} />
                     ) : (
@@ -329,10 +329,10 @@ const WishlistPage = () => {
 
                       {/* Collection Actions */}
                       <div className="bg-gray-50 p-6 flex flex-wrap gap-4 justify-end">
-                        <button className="px-4 py-2 border border-red-500 text-red-500 rounded-md font-medium hover:bg-red-50">
+                        <button className="px-4 py-2 border border-red-500 text-red-500 rounded-md font-medium hover:bg-red-50 cursor-pointer">
                           Clear Collection
                         </button>
-                        <button className="px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark">
+                        <button className="px-4 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark cursor-pointer">
                           Add All to Cart
                         </button>
                       </div>
@@ -394,7 +394,7 @@ const WishlistPage = () => {
                 </div>
               </Link>
               <div className="px-4 pb-4">
-                <button className="w-full bg-primary text-white py-2 rounded-md font-medium">
+                <button className="w-full bg-primary text-white py-2 rounded-md font-medium cursor-pointer hover:bg-primary-dark transition-colors">
                   Add to Wishlist
                 </button>
               </div>
@@ -423,7 +423,7 @@ const WishlistPage = () => {
                 </div>
               </Link>
               <div className="px-4 pb-4">
-                <button className="w-full bg-primary text-white py-2 rounded-md font-medium">
+                <button className="w-full bg-primary text-white py-2 rounded-md font-medium cursor-pointer hover:bg-primary-dark transition-colors">
                   Add to Wishlist
                 </button>
               </div>
@@ -452,7 +452,7 @@ const WishlistPage = () => {
                 </div>
               </Link>
               <div className="px-4 pb-4">
-                <button className="w-full bg-primary text-white py-2 rounded-md font-medium">
+                <button className="w-full bg-primary text-white py-2 rounded-md font-medium cursor-pointer hover:bg-primary-dark transition-colors">
                   Add to Wishlist
                 </button>
               </div>
@@ -481,7 +481,7 @@ const WishlistPage = () => {
                 </div>
               </Link>
               <div className="px-4 pb-4">
-                <button className="w-full bg-primary text-white py-2 rounded-md font-medium">
+                <button className="w-full bg-primary text-white py-2 rounded-md font-medium cursor-pointer hover:bg-primary-dark transition-colors">
                   Add to Wishlist
                 </button>
               </div>

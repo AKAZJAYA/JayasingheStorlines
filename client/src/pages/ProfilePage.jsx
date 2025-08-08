@@ -75,7 +75,7 @@ const ProfilePage = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <button className="absolute bottom-0 right-0 bg-white text-primary p-1 rounded-full border border-gray-200">
+                <button className="absolute bottom-0 right-0 bg-white text-primary p-1 rounded-full border border-gray-200 cursor-pointer hover:bg-gray-50">
                   <FiCamera size={16} />
                 </button>
               </div>
@@ -112,7 +112,7 @@ const ProfilePage = () => {
           <div className="flex overflow-x-auto border-b border-gray-200">
             <button
               onClick={() => setActiveTab("personal")}
-              className={`px-6 py-4 font-medium whitespace-nowrap ${
+              className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                 activeTab === "personal"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-600 hover:text-primary"
@@ -122,7 +122,7 @@ const ProfilePage = () => {
             </button>
             <button
               onClick={() => setActiveTab("addresses")}
-              className={`px-6 py-4 font-medium whitespace-nowrap ${
+              className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                 activeTab === "addresses"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-600 hover:text-primary"
@@ -132,7 +132,7 @@ const ProfilePage = () => {
             </button>
             <button
               onClick={() => setActiveTab("payment")}
-              className={`px-6 py-4 font-medium whitespace-nowrap ${
+              className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                 activeTab === "payment"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-600 hover:text-primary"
@@ -142,7 +142,7 @@ const ProfilePage = () => {
             </button>
             <button
               onClick={() => setActiveTab("security")}
-              className={`px-6 py-4 font-medium whitespace-nowrap ${
+              className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                 activeTab === "security"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-600 hover:text-primary"
@@ -166,7 +166,7 @@ const ProfilePage = () => {
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-xl font-bold">Personal Information</h2>
-                  <button className="text-primary hover:underline flex items-center">
+                  <button className="text-primary hover:underline flex items-center cursor-pointer">
                     <FiEdit2 className="mr-2" size={16} /> Edit
                   </button>
                 </div>
@@ -230,12 +230,12 @@ const ProfilePage = () => {
                       <input
                         id="marketing-emails"
                         type="checkbox"
-                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded cursor-pointer"
                         defaultChecked
                       />
                       <label
                         htmlFor="marketing-emails"
-                        className="ml-2 block text-sm text-gray-700"
+                        className="ml-2 block text-sm text-gray-700 cursor-pointer"
                       >
                         Receive marketing emails with offers and new products
                       </label>
@@ -244,12 +244,12 @@ const ProfilePage = () => {
                       <input
                         id="order-updates"
                         type="checkbox"
-                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                        className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded cursor-pointer"
                         defaultChecked
                       />
                       <label
                         htmlFor="order-updates"
-                        className="ml-2 block text-sm text-gray-700"
+                        className="ml-2 block text-sm text-gray-700 cursor-pointer"
                       >
                         Receive SMS updates about your orders
                       </label>
@@ -271,7 +271,7 @@ const ProfilePage = () => {
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-xl font-bold">My Addresses</h2>
-                  <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm">
+                  <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm cursor-pointer hover:bg-primary-dark transition-colors">
                     + Add New Address
                   </button>
                 </div>
@@ -294,10 +294,10 @@ const ProfilePage = () => {
                         <div className="mt-2">{userData.phone}</div>
                       </div>
                       <div className="flex space-x-3">
-                        <button className="text-primary hover:underline text-sm">
+                        <button className="text-primary hover:underline text-sm cursor-pointer">
                           Edit
                         </button>
-                        <button className="text-gray-500 hover:underline text-sm">
+                        <button className="text-gray-500 hover:underline text-sm cursor-pointer">
                           Remove
                         </button>
                       </div>
@@ -313,13 +313,13 @@ const ProfilePage = () => {
                         <div className="mt-2">+94 71 987 6543</div>
                       </div>
                       <div className="flex space-x-3">
-                        <button className="text-primary hover:underline text-sm">
+                        <button className="text-primary hover:underline text-sm cursor-pointer">
                           Edit
                         </button>
-                        <button className="text-gray-500 hover:underline text-sm">
+                        <button className="text-gray-500 hover:underline text-sm cursor-pointer">
                           Remove
                         </button>
-                        <button className="text-gray-500 hover:underline text-sm">
+                        <button className="text-gray-500 hover:underline text-sm cursor-pointer">
                           Set as Default
                         </button>
                       </div>
@@ -341,7 +341,7 @@ const ProfilePage = () => {
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                   <h2 className="text-xl font-bold">Payment Methods</h2>
-                  <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm">
+                  <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm cursor-pointer hover:bg-primary-dark transition-colors">
                     + Add New Card
                   </button>
                 </div>
@@ -386,14 +386,14 @@ const ProfilePage = () => {
                           </div>
                         </div>
                         <div className="flex space-x-3">
-                          <button className="text-primary hover:underline text-sm">
+                          <button className="text-primary hover:underline text-sm cursor-pointer">
                             Edit
                           </button>
-                          <button className="text-gray-500 hover:underline text-sm">
+                          <button className="text-gray-500 hover:underline text-sm cursor-pointer">
                             Remove
                           </button>
                           {!card.isDefault && (
-                            <button className="text-gray-500 hover:underline text-sm">
+                            <button className="text-gray-500 hover:underline text-sm cursor-pointer">
                               Set as Default
                             </button>
                           )}
@@ -430,7 +430,7 @@ const ProfilePage = () => {
                         It's a good idea to use a strong password that you don't
                         use elsewhere
                       </p>
-                      <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md font-medium text-sm">
+                      <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md font-medium text-sm cursor-pointer transition-colors">
                         Change Password
                       </button>
                     </div>
@@ -444,7 +444,7 @@ const ProfilePage = () => {
                         Add an extra layer of security to your account by
                         enabling two-factor authentication
                       </p>
-                      <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm">
+                      <button className="bg-primary text-white px-4 py-2 rounded-md font-medium text-sm cursor-pointer hover:bg-primary-dark transition-colors">
                         Enable 2FA
                       </button>
                     </div>
@@ -458,7 +458,7 @@ const ProfilePage = () => {
                         Once you delete your account, there is no going back.
                         Please be certain.
                       </p>
-                      <button className="border border-red-600 text-red-600 hover:bg-red-50 px-4 py-2 rounded-md font-medium text-sm">
+                      <button className="border border-red-600 text-red-600 hover:bg-red-50 px-4 py-2 rounded-md font-medium text-sm cursor-pointer transition-colors">
                         Delete My Account
                       </button>
                     </div>

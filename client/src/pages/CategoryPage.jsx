@@ -277,7 +277,10 @@ const CategoryPage = () => {
         <div className="min-h-[50vh] flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl text-gray-600 mb-4">No products found</h2>
-            <Link to="/" className="bg-primary text-white px-6 py-2 rounded-md">
+            <Link
+              to="/"
+              className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors cursor-pointer"
+            >
               Return to Home
             </Link>
           </div>
@@ -313,36 +316,43 @@ const CategoryPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Filters and Sort */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
-          <button className="flex items-center space-x-2 bg-white border border-gray-300 px-4 py-2 rounded-md">
+          {/* For the filter button */}
+          <button className="flex items-center space-x-2 bg-white border border-gray-300 px-4 py-2 rounded-md cursor-pointer hover:bg-gray-50">
             <FiFilter size={18} />
             <span>Filter</span>
           </button>
 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
+              {/* For the grid/list view toggle buttons */}
               <button
                 onClick={() => setView("grid")}
-                className={`p-2 rounded-md ${
-                  view === "grid" ? "bg-primary text-white" : "bg-gray-100"
+                className={`p-2 rounded-md cursor-pointer ${
+                  view === "grid"
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 <FiGrid />
               </button>
               <button
                 onClick={() => setView("list")}
-                className={`p-2 rounded-md ${
-                  view === "list" ? "bg-primary text-white" : "bg-gray-100"
+                className={`p-2 rounded-md cursor-pointer ${
+                  view === "list"
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >
                 <FiList />
               </button>
             </div>
 
+            {/* For the sort dropdown */}
             <div className="relative">
               <select
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 px-4 py-2 pr-8 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                className="appearance-none bg-white border border-gray-300 px-4 py-2 pr-8 rounded-md focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
@@ -397,9 +407,10 @@ const CategoryPage = () => {
                     <p className="font-bold text-primary text-xl">
                       Rs. {(product.price || 0).toLocaleString()}
                     </p>
+                    {/* For the "Add to Cart" button in list view */}
                     <button
                       onClick={() => handleAddToCart(product._id)}
-                      className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center"
+                      className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center cursor-pointer"
                     >
                       <FiShoppingCart className="mr-2" /> Add to Cart
                     </button>

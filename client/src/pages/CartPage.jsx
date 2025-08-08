@@ -271,7 +271,7 @@ const CartPage = () => {
                         </Link>
                         <button
                           onClick={() => handleRemoveFromCart(item.product)}
-                          className="text-gray-500 hover:text-red-600 p-1"
+                          className="text-gray-500 hover:text-red-600 p-1 cursor-pointer"
                         >
                           <FiTrash2 size={18} />
                         </button>
@@ -286,7 +286,7 @@ const CartPage = () => {
                                 item.quantity - 1
                               )
                             }
-                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
+                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 cursor-pointer"
                             disabled={item.quantity <= 1}
                           >
                             <FiMinus size={16} />
@@ -301,7 +301,7 @@ const CartPage = () => {
                                 item.quantity + 1
                               )
                             }
-                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
+                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 cursor-pointer"
                           >
                             <FiPlus size={16} />
                           </button>
@@ -319,13 +319,13 @@ const CartPage = () => {
               <div className="p-6 flex justify-between items-center bg-gray-50">
                 <Link
                   to="/"
-                  className="flex items-center text-primary font-medium hover:underline"
+                  className="flex items-center text-primary font-medium hover:underline cursor-pointer"
                 >
                   <FiArrowRight className="mr-2 rotate-180" /> Continue Shopping
                 </Link>
                 <button
                   onClick={handleClearCart}
-                  className="text-gray-600 hover:text-red-600 font-medium"
+                  className="text-gray-600 hover:text-red-600 font-medium cursor-pointer"
                 >
                   Clear Cart
                 </button>
@@ -370,7 +370,7 @@ const CartPage = () => {
                       />
                       <label
                         htmlFor="standard-shipping"
-                        className="ml-2 flex justify-between w-full"
+                        className="ml-2 flex justify-between w-full cursor-pointer"
                       >
                         <span className="text-sm text-gray-700">
                           Standard Delivery (3-5 days)
@@ -392,7 +392,7 @@ const CartPage = () => {
                       />
                       <label
                         htmlFor="express-shipping"
-                        className="ml-2 flex justify-between w-full"
+                        className="ml-2 flex justify-between w-full cursor-pointer"
                       >
                         <span className="text-sm text-gray-700">
                           Express Delivery (1-2 days)
@@ -414,7 +414,7 @@ const CartPage = () => {
                       />
                       <label
                         htmlFor="pickup"
-                        className="ml-2 flex justify-between w-full"
+                        className="ml-2 flex justify-between w-full cursor-pointer"
                       >
                         <span className="text-sm text-gray-700">
                           Store Pickup (Today)
@@ -445,7 +445,7 @@ const CartPage = () => {
                           ? () => dispatch(removePromoCode())
                           : handleApplyPromoCode
                       }
-                      className={`px-4 py-2 text-white font-medium rounded-r-md ${
+                      className={`px-4 py-2 text-white font-medium rounded-r-md cursor-pointer ${
                         promoCode
                           ? "bg-red-600 hover:bg-red-700"
                           : "bg-primary hover:bg-primary-dark"
@@ -495,7 +495,7 @@ const CartPage = () => {
               <div className="p-6 bg-gray-50">
                 <button
                   onClick={handleProceedToCheckout}
-                  className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium flex items-center justify-center mb-4 hover:bg-primary-dark transition-colors"
+                  className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium flex items-center justify-center mb-4 hover:bg-primary-dark transition-colors cursor-pointer"
                 >
                   Proceed to Checkout <FiArrowRight className="ml-2" />
                 </button>

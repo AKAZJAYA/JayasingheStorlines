@@ -283,7 +283,7 @@ const CheckoutPage = () => {
           <div className="flex items-center justify-center">
             <div className="flex items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer ${
                   activeStep === "shipping"
                     ? "bg-primary text-white"
                     : "bg-primary text-white"
@@ -473,7 +473,7 @@ const CheckoutPage = () => {
                     <div className="pt-4">
                       <button
                         type="submit"
-                        className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium hover:bg-primary-dark transition-colors"
+                        className="w-full bg-primary text-white py-3 px-4 rounded-md font-medium hover:bg-primary-dark transition-colors cursor-pointer"
                       >
                         Continue to Payment
                       </button>
@@ -509,7 +509,7 @@ const CheckoutPage = () => {
                           />
                           <label
                             htmlFor="card-payment"
-                            className="ml-2 flex items-center"
+                            className="ml-2 flex items-center cursor-pointer"
                           >
                             <span className="text-sm text-gray-700 mr-2">
                               Credit/Debit Card
@@ -540,7 +540,7 @@ const CheckoutPage = () => {
                           />
                           <label
                             htmlFor="paypal-payment"
-                            className="ml-2 flex items-center"
+                            className="ml-2 flex items-center cursor-pointer"
                           >
                             <span className="text-sm text-gray-700 mr-2">
                               PayPal
@@ -564,7 +564,7 @@ const CheckoutPage = () => {
                           />
                           <label
                             htmlFor="cod-payment"
-                            className="ml-2 flex items-center"
+                            className="ml-2 flex items-center cursor-pointer"
                           >
                             <span className="text-sm text-gray-700">
                               Cash on Delivery
@@ -655,7 +655,7 @@ const CheckoutPage = () => {
                           />
                           <label
                             htmlFor="same-as-shipping"
-                            className="ml-2 text-sm text-gray-700"
+                            className="ml-2 text-sm text-gray-700 cursor-pointer"
                           >
                             Same as shipping address
                           </label>
@@ -780,13 +780,13 @@ const CheckoutPage = () => {
                       <button
                         type="button"
                         onClick={handleBackToShipping}
-                        className="mt-3 sm:mt-0 w-full sm:w-auto border border-gray-300 bg-white text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center"
+                        className="mt-3 sm:mt-0 w-full sm:w-auto border border-gray-300 bg-white text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer"
                       >
                         <FiArrowLeft className="mr-2" /> Back to Shipping
                       </button>
                       <button
                         type="submit"
-                        className="w-full sm:w-auto bg-primary text-white py-2 px-6 rounded-md font-medium hover:bg-primary-dark transition-colors"
+                        className="w-full sm:w-auto bg-primary text-white py-2 px-6 rounded-md font-medium hover:bg-primary-dark transition-colors cursor-pointer"
                       >
                         Review Order
                       </button>
@@ -898,14 +898,14 @@ const CheckoutPage = () => {
                       <button
                         type="button"
                         onClick={handleBackToPayment}
-                        className="mt-3 sm:mt-0 w-full sm:w-auto border border-gray-300 bg-white text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center"
+                        className="mt-3 sm:mt-0 w-full sm:w-auto border border-gray-300 bg-white text-gray-700 py-2 px-4 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer"
                       >
                         <FiArrowLeft className="mr-2" /> Back to Payment
                       </button>
                       <button
                         onClick={handlePlaceOrder}
                         disabled={isProcessing}
-                        className="w-full sm:w-auto bg-primary text-white py-2 px-6 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center justify-center"
+                        className="w-full sm:w-auto bg-primary text-white py-2 px-6 rounded-md font-medium hover:bg-primary-dark transition-colors flex items-center justify-center cursor-pointer"
                       >
                         {isProcessing ? (
                           <>

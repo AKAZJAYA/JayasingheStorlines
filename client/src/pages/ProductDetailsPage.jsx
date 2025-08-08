@@ -270,7 +270,7 @@ const ProductDetailsPage = () => {
                   product.additionalImages.length > 0 && (
                     <>
                       <button
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-gray-800 focus:outline-none transition-all duration-300"
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-gray-800 focus:outline-none transition-all duration-300 cursor-pointer"
                         onClick={() =>
                           setActiveImage((prev) =>
                             prev === -1
@@ -284,7 +284,7 @@ const ProductDetailsPage = () => {
                         <FiChevronLeft size={20} />
                       </button>
                       <button
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-gray-800 focus:outline-none transition-all duration-300"
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 hover:bg-opacity-100 p-2 rounded-full text-gray-800 focus:outline-none transition-all duration-300 cursor-pointer"
                         onClick={() =>
                           setActiveImage((prev) =>
                             prev === product.additionalImages.length - 1
@@ -484,7 +484,7 @@ const ProductDetailsPage = () => {
                       className={`px-3 py-1 ${
                         quantity <= 1
                           ? "text-gray-400"
-                          : "text-gray-700 hover:bg-gray-100"
+                          : "text-gray-700 hover:bg-gray-100 cursor-pointer"
                       }`}
                     >
                       -
@@ -498,7 +498,7 @@ const ProductDetailsPage = () => {
                       className={`px-3 py-1 ${
                         quantity >= (product.stock || 10)
                           ? "text-gray-400"
-                          : "text-gray-700 hover:bg-gray-100"
+                          : "text-gray-700 hover:bg-gray-100 cursor-pointer"
                       }`}
                     >
                       +
@@ -579,7 +579,7 @@ const ProductDetailsPage = () => {
               <div className="flex overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("description")}
-                  className={`px-6 py-4 font-medium whitespace-nowrap ${
+                  className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "description"
                       ? "text-primary border-b-2 border-primary"
                       : "text-gray-600 hover:text-primary"
@@ -589,7 +589,7 @@ const ProductDetailsPage = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("specifications")}
-                  className={`px-6 py-4 font-medium whitespace-nowrap ${
+                  className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "specifications"
                       ? "text-primary border-b-2 border-primary"
                       : "text-gray-600 hover:text-primary"
@@ -599,7 +599,7 @@ const ProductDetailsPage = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("reviews")}
-                  className={`px-6 py-4 font-medium whitespace-nowrap ${
+                  className={`px-6 py-4 font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "reviews"
                       ? "text-primary border-b-2 border-primary"
                       : "text-gray-600 hover:text-primary"
@@ -745,7 +745,7 @@ const ProductDetailsPage = () => {
                                 key={star}
                                 type="button"
                                 onClick={() => setReviewRating(star)}
-                                className="focus:outline-none"
+                                className="focus:outline-none cursor-pointer"
                               >
                                 <FiStar
                                   size={24}
@@ -797,7 +797,7 @@ const ProductDetailsPage = () => {
                         </div>
                         <button
                           type="submit"
-                          className="w-full py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark transition-colors"
+                          className="w-full py-3 bg-primary text-white rounded-md font-medium hover:bg-primary-dark transition-colors cursor-pointer"
                         >
                           Submit Review
                         </button>
